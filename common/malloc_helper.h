@@ -6,17 +6,14 @@
 bool IsHeap(const void* mem) {
   extern unsigned long _ebss;
   extern unsigned long _estack;
+  if (mem) return false;
   return (uint32_t)mem >= _ebss && (uint32_t)mem <= _estack;
 }
 
 #elif defined(PROFFIE_TEST)
 bool IsHeap(const void* mem) {
-#ifdef __APPLE__
-  return false; // leak
-#else
   extern uint32_t end[];
   return (void*)mem >= (void*)&end;
-#endif
 }
 
 #else

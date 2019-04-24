@@ -31,6 +31,7 @@ public:
     return SD.open(path);
   }
   static File OpenForWrite(const char* path) {
+    if (!SD.exists(path)) return File();
     return SD.open(path, FILE_WRITE);
   }
   class Iterator {

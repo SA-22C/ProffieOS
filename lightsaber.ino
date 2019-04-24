@@ -23,6 +23,8 @@
 
 //#define CONFIG_FILE "config/default_proffieboard_config.h"
 #define CONFIG_FILE "config/proffiesaber.h"
+//#define CONFIG_FILE "config/tgs.h"
+//#define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
 // #define CONFIG_FILE "config/graflex_v1_config.h"
@@ -42,7 +44,7 @@
 #include CONFIG_FILE
 #undef CONFIG_TOP
 
-// #define ENABLE_DEBUG
+#define ENABLE_DEBUG
 
 
 //
@@ -453,8 +455,6 @@ EFFECT(blaster);
 EFFECT(lockup);
 EFFECT(poweronf);
 EFFECT(font);   // also polyphonic
-EFFECT(endlock); // Plecter endlock support
-
 
 // Polyphonic fonts
 EFFECT(blst);
@@ -542,6 +542,8 @@ public:
     CONFIG_VARIABLE(Transition1Degrees, 45.0f);
     CONFIG_VARIABLE(Transition2Degrees, 160.0f);
     CONFIG_VARIABLE(MaxSwingVolume, 3.0f);
+    CONFIG_VARIABLE(AccentSwingSpeedThreshold, 650.0f);
+    CONFIG_VARIABLE(AccentSwingVolume, 3.0f);
   };
 
   int  Version;
@@ -552,6 +554,8 @@ public:
   float Transition1Degrees;
   float Transition2Degrees;
   float MaxSwingVolume;
+  float AccentSwingSpeedThreshold;
+  float AccentSwingVolume;
 };
 
 SmoothSwingConfigFile smooth_swing_config;
@@ -631,8 +635,6 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "functions/int_arg.h"
 #include "functions/sin.h"
 #include "functions/scale.h"
-#include "functions/battery_level.h"
-#include "functions/trigger.h"
 
 // This macro has a problem with commas, please don't use it.
 #define EASYBLADE(COLOR, CLASH_COLOR) \
@@ -809,7 +811,6 @@ public:
       SaberBase::DoEndLockup();
     }
     SaberBase::TurnOff();
-      STDOUT.println("Retraction");
     if (unmute_on_deactivation_) {
       unmute_on_deactivation_ = false;
 #ifdef ENABLE_AUDIO
@@ -1256,7 +1257,6 @@ protected:
     if (b & BUTTON_RIGHT) STDOUT.print("Right");
     if (b & BUTTON_SELECT) STDOUT.print("Select");
     if (b & MODE_ON) STDOUT.print("On");
-    if (b & MODE_VOLUME) STDOUT.print("Volume Menu");
   }
 
   void PrintEvent(EVENT e) {
@@ -1276,7 +1276,7 @@ protected:
       case EVENT_CLASH: STDOUT.print("Clash"); break;
       case EVENT_HELD: STDOUT.print("Held"); break;
       case EVENT_HELD_LONG: STDOUT.print("HeldLong"); break;
-      case EVENT_HELD_MEDIUM: STDOUT.print("HeldMediumLong"); break;
+      case EVENT_HELD_MEDIUM: STDOUT.print("HeldMedium"); break;
     }
   }
 
@@ -1318,6 +1318,7 @@ public:
 
       case EVENTID(BUTTON_POWER, EVENT_PRESSED, MODE_ON):
       case EVENTID(BUTTON_AUX, EVENT_PRESSED, MODE_ON):
+      case EVENTID(BUTTON_AUX2, EVENT_PRESSED, MODE_ON):
         if (accel_.x < -0.15) {
           pointing_down_ = true;
         } else {
@@ -1328,11 +1329,13 @@ public:
 #if NUM_BUTTONS == 0
       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_OFF):
 #endif
+
       case EVENTID(BUTTON_POWER, EVENT_LATCH_ON, MODE_OFF):
       case EVENTID(BUTTON_AUX, EVENT_LATCH_ON, MODE_OFF):
       case EVENTID(BUTTON_AUX2, EVENT_LATCH_ON, MODE_OFF):
-    case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_OFF):
-        if (MODE_VOLUME){
+      case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_OFF):
+#if NUM_BUTTONS == 2
+         if (MODE_VOLUME){
             STDOUT.println("Volume up");
             if (dynamic_mixer.get_volume() < max_volume_){
                 current_volume_ += max_volume_ * 0.10;
@@ -1345,16 +1348,16 @@ public:
                 beeper.Beep(0.5, 1000);
             }
         }
-        else{
+#endif
+        if (!MODE_VOLUME){
             
             aux_on_ = false;
             On();
         }
         break;
-        
-        
-    case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_OFF):
-        if (MODE_VOLUME){
+      case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_OFF):
+#if NUM_BUTTONS == 2
+    if (MODE_VOLUME){
             STDOUT.println("Volume Down");
             if (dynamic_mixer.get_volume() <= max_volume_ && dynamic_mixer.get_volume() > (0.10 * max_volume_)){
                 current_volume_ = dynamic_mixer.get_volume();
@@ -1368,8 +1371,23 @@ public:
                 beeper.Beep(0.5, 1000);
             }
         }
-        else{
-            
+ #endif
+ #if NUM_BUTTONS == 3
+          if (MODE_VOLUME){
+            STDOUT.println("Volume up");
+            if (dynamic_mixer.get_volume() < max_volume_){
+                current_volume_ += max_volume_ * 0.10;
+                dynamic_mixer.set_volume(current_volume_);
+                beeper.Beep(0.5, 2000);
+                STDOUT.print("Current Volume: ");
+                STDOUT.println(dynamic_mixer.get_volume());
+            }
+            else{
+                beeper.Beep(0.5, 1000);
+            }
+        }
+#endif
+        if (!MODE_VOLUME) {  
 #ifdef DUAL_POWER_BUTTONS
             aux_on_ = true;
             On();
@@ -1378,9 +1396,22 @@ public:
 #endif
         }
         break;
-            
-        case EVENTID(BUTTON_POWER, EVENT_DOUBLE_CLICK, MODE_ON):
-            if (millis() - activated_ < 500) {
+     
+      case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON):
+        SaberBase::DoBlast();
+        break;
+      #if NUM_BUTTONS == 1
+        case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON | BUTTON_POWER):
+        SaberBase::DoForce();
+        break;
+        case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_ON):
+        StartOrStopTrack();
+        break;
+      #endif
+      case EVENTID(BUTTON_POWER, EVENT_DOUBLE_CLICK, MODE_ON):
+      
+      
+	    if (millis() - activated_ < 500) {
                 if (SetMute(true)) {
                     unmute_on_deactivation_ = true;
                 }
@@ -1390,27 +1421,32 @@ public:
             }
             break;
 
-	
+#if NUM_BUTTONS > 1 
       case EVENTID(BUTTON_POWER, EVENT_HELD_MEDIUM, MODE_ON):
       case EVENTID(BUTTON_POWER, EVENT_LATCH_OFF, MODE_ON):
       case EVENTID(BUTTON_AUX, EVENT_LATCH_OFF, MODE_ON):
       case EVENTID(BUTTON_AUX2, EVENT_LATCH_OFF, MODE_ON):
+#endif
 #if NUM_BUTTONS == 0
       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON):
 #endif
-        Off();
-        break;
-            
-      case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_ON):
-        // Avoid the base and the very tip.
-	// TODO: Make blast only appear on one blade!
-        SaberBase::DoBlast();
+#if NUM_BUTTONS == 1
+      case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_ON):
+#endif
+        if (!SaberBase::Lockup()) {
+          Off();
+        }
         break;
 
         // Lockup
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_POWER):
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_AUX):
+#if NUM_BUTTONS == 2        
         case EVENTID(BUTTON_AUX, EVENT_HELD, MODE_ON):
+#endif
+#if NUM_BUTTONS == 3
+        case EVENTID(BUTTON_AUX2, EVENT_HELD, MODE_ON):
+#endif
         if (!SaberBase::Lockup()) {
           if (pointing_down_) {
             SaberBase::SetLockup(SaberBase::LOCKUP_DRAG);
@@ -1422,12 +1458,17 @@ public:
           handled = false;
         }
         break;
-
         // Off functions
       case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_OFF):
+      #if NUM_BUTTONS == 1
+          next_preset();
+      #endif
+      #if NUM_BUTTONS > 1
         StartOrStopTrack();
+      #endif
         break;
-        case EVENTID(BUTTON_AUX, EVENT_CLICK_LONG, MODE_OFF):
+        
+      case EVENTID(BUTTON_AUX, EVENT_CLICK_LONG, MODE_OFF):
             current_volume_ = dynamic_mixer.get_volume();
             if (MODE_VOLUME){
                 MODE_VOLUME = false;
@@ -1455,11 +1496,29 @@ public:
         break;
 
       case EVENTID(BUTTON_AUX2, EVENT_CLICK_SHORT, MODE_OFF):
-#ifdef DUAL_POWER_BUTTONS
-        next_preset();
-#else
-        previous_preset();
+#if NUM_BUTTONS == 3     
+      if (MODE_VOLUME){
+            STDOUT.println("Volume Down");
+            if (dynamic_mixer.get_volume() <= max_volume_ && dynamic_mixer.get_volume() > (0.10 * max_volume_)){
+                current_volume_ = dynamic_mixer.get_volume();
+                current_volume_ -= (max_volume_ * 0.10) ;
+                dynamic_mixer.set_volume(current_volume_);
+                beeper.Beep(0.5, 2000);
+                STDOUT.print("Current Volume: ");
+                STDOUT.println(dynamic_mixer.get_volume());
+            }
+            else{
+                beeper.Beep(0.5, 1000);
+            }
+        }
 #endif
+
+#ifdef DUAL_POWER_BUTTONS
+        if(!MODE_VOLUME) {next_preset();}
+#else
+        if(!MODE_VOLUME) {previous_preset();}
+#endif
+
         break;
     }
     if (!handled) {
@@ -1468,6 +1527,7 @@ public:
       switch (EVENTID(button, event, SaberBase::IsOn() ? MODE_ON : MODE_OFF)) {
         case EVENTID(BUTTON_POWER, EVENT_RELEASED, MODE_ON):
         case EVENTID(BUTTON_AUX, EVENT_RELEASED, MODE_ON):
+        case EVENTID(BUTTON_AUX2, EVENT_RELEASED, MODE_ON):
           if (SaberBase::Lockup()) {
             SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
             SaberBase::DoEndLockup();
@@ -1485,6 +1545,7 @@ public:
       return false;
     }
   }
+
 
   bool Parse(const char *cmd, const char* arg) override {
     if (!strcmp(cmd, "id")) {
@@ -3223,6 +3284,71 @@ void setup() {
   }
 #endif // ENABLE_AUDIO && ENABLE_SD
 }
+
+#if 0
+extern "C" void startup_early_hook(void) {
+#ifdef ENABLE_WATCHDOG
+  // The next 2 lines sets the time-out value. This is the value that the watchdog timer compares itself to
+  WDOG_TOVALL = 1000;
+  WDOG_TOVALH = 0;
+  WDOG_STCTRLH = (WDOG_STCTRLH_ALLOWUPDATE | WDOG_STCTRLH_WDOGEN |
+                  WDOG_STCTRLH_STOPEN |
+                  WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN); // Enable WDG
+  WDOG_PRESC = 0; // prescaler
+#elif defined(KINETISK)
+        WDOG_STCTRLH = WDOG_STCTRLH_ALLOWUPDATE;
+#elif defined(KINETISL)
+        SIM_COPC = 0;  // disable the watchdog
+#endif
+        // enable clocks to always-used peripherals
+#if defined(__MK20DX128__)
+        SIM_SCGC5 = 0x00043F82;         // clocks active to all GPIO
+        SIM_SCGC6 = SIM_SCGC6_RTC | SIM_SCGC6_FTM0 | SIM_SCGC6_FTM1 | SIM_SCGC6_ADC0 | SIM_SCGC6_FTFL;
+#elif defined(__MK20DX256__)
+        SIM_SCGC3 = SIM_SCGC3_ADC1 | SIM_SCGC3_FTM2;
+        SIM_SCGC5 = 0x00043F82;         // clocks active to all GPIO
+        SIM_SCGC6 = SIM_SCGC6_RTC | SIM_SCGC6_FTM0 | SIM_SCGC6_FTM1 | SIM_SCGC6_ADC0 | SIM_SCGC6_FTFL;
+#elif defined(__MK64FX512__) || defined(__MK66FX1M0__)
+        SIM_SCGC3 = SIM_SCGC3_ADC1 | SIM_SCGC3_FTM2 | SIM_SCGC3_FTM3;
+        SIM_SCGC5 = 0x00043F82;         // clocks active to all GPIO
+        SIM_SCGC6 = SIM_SCGC6_RTC | SIM_SCGC6_FTM0 | SIM_SCGC6_FTM1 | SIM_SCGC6_ADC0 | SIM_SCGC6_FTFL;
+        //PORTC_PCR5 = PORT_PCR_MUX(1) | PORT_PCR_DSE | PORT_PCR_SRE;
+        //GPIOC_PDDR |= (1<<5);
+        //GPIOC_PSOR = (1<<5);
+        //while (1);
+#elif defined(__MKL26Z64__)
+        SIM_SCGC4 = SIM_SCGC4_USBOTG | 0xF0000030;
+        SIM_SCGC5 = 0x00003F82;         // clocks active to all GPIO
+        SIM_SCGC6 = SIM_SCGC6_ADC0 | SIM_SCGC6_TPM0 | SIM_SCGC6_TPM1 | SIM_SCGC6_TPM2 | SIM_SCGC6_FTFL;
+#endif
+#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
+        SCB_CPACR = 0x00F00000;
+#endif
+#if defined(__MK66FX1M0__)
+        LMEM_PCCCR = 0x85000003;
+#endif
+}
+#endif
+
+#ifdef ENABLE_WATCHDOG
+class WatchDog : Looper {
+  const char* name() override { return "WatchDog"; }
+  void Loop() override {
+    if (watchdogTimer_ > 5) {
+      watchdogTimer_ = 0;
+      
+      noInterrupts();
+      WDOG_REFRESH = 0xA602;
+      WDOG_REFRESH = 0xB480;
+      interrupts();
+    }
+  };
+
+  elapsedMillis watchdogTimer_;
+};
+
+WatchDog dog;
+#endif
 
 #ifdef MTP_RX_ENDPOINT
 

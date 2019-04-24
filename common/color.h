@@ -22,13 +22,6 @@ class Color8 {
                    ((16384-x) * g + x * other.g) >> 14,
                    ((16384-x) * b + x * other.b) >> 14);
   }
-  // x = 0..32768
-  Color8 mix3(const Color8& other, int x) const {
-    // Wonder if there is an instruction for this?
-    return Color8( ((32768-x) * r + x * other.r) >> 15,
-                   ((32768-x) * g + x * other.g) >> 15,
-                   ((32768-x) * b + x * other.b) >> 15);
-  }
   uint8_t select(const Color8& other) const {
     uint8_t ret = 255;
     if (other.r) ret = std::min<int>(ret, r * 255 / other.r);
@@ -92,10 +85,6 @@ class Color8 {
       case 7: return b - std::min(r, std::min(g, b));
     }
   }
-
-  Color8 operator*(uint8_t v) const {
-    return Color8(r * v / 255, g * v / 255, b * v / 255);
-  }
   
   uint8_t r, g, b;
 };
@@ -131,13 +120,6 @@ class Color16 {
     return Color16( ((16384-x) * r + x * other.r) >> 14,
                     ((16384-x) * g + x * other.g) >> 14,
                     ((16384-x) * b + x * other.b) >> 14);
-  }
-  // x = 0..32768
-  Color16 mix3(const Color16& other, int x) const {
-    // Wonder if there is an instruction for this?
-    return Color16(((32768-x) * r + x * other.r) >> 15,
-                   ((32768-x) * g + x * other.g) >> 15,
-                   ((32768-x) * b + x * other.b) >> 15);
   }
   uint16_t select(const Color16& other) const {
     uint32_t ret = 65535;

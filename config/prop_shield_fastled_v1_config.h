@@ -50,7 +50,6 @@ const unsigned int maxLedsPerStrip = 144;
 // #define ENABLE_WATCHDOG
 // #define ENABLE_SD
 #define ENABLE_SERIALFLASH
-#define ENABLE_SSD1306
 
 #endif
 
