@@ -38,6 +38,7 @@ public:
     SetDelegate(NULL);
     A.Free();
     B.Free();
+    accent_player_.Free();
   }
   
   void Swap() {
