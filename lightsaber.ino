@@ -1410,9 +1410,11 @@ public:
         StartOrStopTrack();
         break;
       #endif
+      #if NUM_BUTTONS > 1
       case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_ON):
                 SaberBase::DoForce();
       break;
+      #endif
       case EVENTID(BUTTON_POWER, EVENT_DOUBLE_CLICK, MODE_ON):
 	    if (millis() - activated_ < 500) {
                 if (SetMute(true)) {
