@@ -1399,9 +1399,11 @@ public:
         }
         break;
      
-      case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON):
+      #if NUM_BUTTONS > 1
+      case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_ON):
         SaberBase::DoBlast();
-        break;
+      break;
+      #endif
       #if NUM_BUTTONS == 1
         case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON | BUTTON_POWER):
         SaberBase::DoForce();
@@ -1409,23 +1411,20 @@ public:
         case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_ON):
         StartOrStopTrack();
         break;
-      #endif
-      #if NUM_BUTTONS > 1
-      case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_ON):
-                SaberBase::DoForce();
-      break;
+      case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON):
+        SaberBase::DoBlast();
+        break;
       #endif
       case EVENTID(BUTTON_POWER, EVENT_DOUBLE_CLICK, MODE_ON):
 	    if (millis() - activated_ < 500) {
                 if (SetMute(true)) {
                     unmute_on_deactivation_ = true;
                 }
+            }else{
+              SaberBase::DoForce();
             }
             
             break;
-
-
-
       case EVENTID(BUTTON_POWER, EVENT_LATCH_OFF, MODE_ON):
       case EVENTID(BUTTON_AUX, EVENT_LATCH_OFF, MODE_ON):
       case EVENTID(BUTTON_AUX2, EVENT_LATCH_OFF, MODE_ON):
