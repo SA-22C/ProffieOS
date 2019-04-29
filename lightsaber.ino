@@ -1435,6 +1435,9 @@ public:
       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON):
 #endif
       case EVENTID(BUTTON_POWER, EVENT_HELD_MEDIUM, MODE_ON):
+#if NUM_BUTTONS == 1
+      case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_ON):
+#endif
         if (!SaberBase::Lockup()) {
           Off();
         }
