@@ -1420,10 +1420,12 @@ public:
                 if (SetMute(true)) {
                     unmute_on_deactivation_ = true;
                 }
-            }else{
+            }
+	    #if NUM_BUTTONS > 1    
+            else{
               SaberBase::DoForce();
             }
-            
+            #endif
             break;
       case EVENTID(BUTTON_POWER, EVENT_LATCH_OFF, MODE_ON):
       case EVENTID(BUTTON_AUX, EVENT_LATCH_OFF, MODE_ON):
@@ -1432,7 +1434,7 @@ public:
 #if NUM_BUTTONS == 0
       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON):
 #endif
-      case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_ON):
+      case EVENTID(BUTTON_POWER, EVENT_HELD_MEDIUM, MODE_ON):
         if (!SaberBase::Lockup()) {
           Off();
         }
