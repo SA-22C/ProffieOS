@@ -22,8 +22,8 @@
 // to use here.
 
 //#define CONFIG_FILE "config/default_proffieboard_config.h"
-#define CONFIG_FILE "config/proffiesaber.h"
-//#define CONFIG_FILE "config/tgs.h"
+//#define CONFIG_FILE "config/proffiesaber.h"
+#define CONFIG_FILE "config/tgs.h"
 //#define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
@@ -186,7 +186,7 @@ SnoozeTouch snooze_touch;
 SnoozeBlock snooze_config(snooze_touch, snooze_digital, snooze_timer);
 #endif
 
-const char version[] = "$Id$";
+const char version[] = "$Id: e6a83aee8c0db6e6bd5c35369f9453f44eee7e80 $";
 
 #include "common/state_machine.h"
 #include "common/monitoring.h"
@@ -542,9 +542,10 @@ public:
     CONFIG_VARIABLE(Transition1Degrees, 45.0f);
     CONFIG_VARIABLE(Transition2Degrees, 160.0f);
     CONFIG_VARIABLE(MaxSwingVolume, 3.0f);
-    CONFIG_VARIABLE(AccentSwingSpeedThreshold, 550.0f);
-    CONFIG_VARIABLE(AccentSwingVolumeSharpness, 1.0f);
+    CONFIG_VARIABLE(AccentSwingSpeedThreshold, 650.0f);
+    CONFIG_VARIABLE(AccentSwingVolumeSharpness, 1.75f);
     CONFIG_VARIABLE(MaxAccentSwingVolume, 3.0f);
+    CONFIG_VARIABLE(MaxAccentSwingDucking, 0.5f);
   };
 
   int  Version;
@@ -558,6 +559,7 @@ public:
   float AccentSwingSpeedThreshold;
   float AccentSwingVolumeSharpness;
   float MaxAccentSwingVolume;
+  float MaxAccentSwingDucking;
 };
 
 SmoothSwingConfigFile smooth_swing_config;
@@ -1416,12 +1418,12 @@ public:
         break;
       #endif
       case EVENTID(BUTTON_POWER, EVENT_DOUBLE_CLICK, MODE_ON):
-	    if (millis() - activated_ < 500) {
+      if (millis() - activated_ < 500) {
                 if (SetMute(true)) {
                     unmute_on_deactivation_ = true;
                 }
             }
-	    #if NUM_BUTTONS > 1    
+      #if NUM_BUTTONS > 1    
             else{
               SaberBase::DoForce();
             }
@@ -1434,10 +1436,7 @@ public:
 #if NUM_BUTTONS == 0
       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON):
 #endif
-      case EVENTID(BUTTON_POWER, EVENT_HELD_MEDIUM, MODE_ON):
-#if NUM_BUTTONS == 1
       case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_ON):
-#endif
         if (!SaberBase::Lockup()) {
           Off();
         }
@@ -1496,9 +1495,11 @@ public:
         next_preset();
         break;
 
+#if NUM_BUTTONS > 1
       case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_OFF | BUTTON_AUX):
         previous_preset();
         break;
+#endif
 
       case EVENTID(BUTTON_AUX2, EVENT_CLICK_SHORT, MODE_OFF):
 #if NUM_BUTTONS == 3     
