@@ -208,11 +208,8 @@ public:
           drag.files_found()) {
         PlayMonophonic(&drag, &drag);
       } else if (lockup.files_found()) {
-        if (bgnlock.files_found()) {
-          PlayMonophonic(&bgnlock, &lockup);
-        } else {
+        
           PlayMonophonic(&lockup, &lockup);
-        }
       }
     } else {
       Effect* e = &lock;
@@ -221,11 +218,7 @@ public:
         e = &drag;
       }
       if (!lock_player_) {
-        if (bgnlock.files_found()) {
-          lock_player_ = PlayPolyphonic(&bgnlock);
-        } else {
           lock_player_ = PlayPolyphonic(e);
-        }
       }
       
       if (lock_player_) {
@@ -238,23 +231,14 @@ public:
     if (lock_player_) {
       // Polyphonic case
       lock_player_->set_fade_time(0.3);
-      if (endlock.files_found()) { // polyphonic end lock
-        if (PlayPolyphonic(&endlock)) {
-          // if playing an end lock fade the lockup faster
-          lock_player_->set_fade_time(0.003);
-        }
-      }
+      
       lock_player_->FadeAndStop();
       lock_player_.Free();
       return;
     }
     // Monophonic case
     if (lockup.files_found()) {
-      if (endlock.files_found()) { // Plecter font endlock support
-        PlayMonophonic(&endlock, &hum);
-      } else {
-        PlayMonophonic(&clash, &hum);
-      }
+      PlayMonophonic(&clash, &hum);
     }
   }
   
