@@ -8,7 +8,6 @@
 class SmoothSwingV2 : public SaberBasePassThrough {
 public:
   SmoothSwingV2() : SaberBasePassThrough() {}
-  
   void Activate(SaberBase* base_font) {
     STDOUT.println("Activating SmoothSwing V2");
     SetDelegate(base_font);
@@ -17,30 +16,28 @@ public:
     }
     swings_ = std::min<size_t>(swingl.files_found(), swingh.files_found());
     //check for swngxx files to use as accent swings
-    if (swng.files_found() > 0) {
-      STDOUT.print("Accent Swings Detected: ");
+    if ((swng.files_found() || swing.files_found()) > 0 && smooth_swing_config.AccentSwingSpeedThreshold > 0.0) {
+      STDOUT.println("Accent Swings Enabled.");
+      STDOUT.print("Polyphonic swings: ");
       STDOUT.println(swng.files_found());
+      STDOUT.print("Monophonic swings: ");
+      STDOUT.println(swing.files_found());
       accent_swings_present = true;
-    }
-    else
-    {
+    }else{
       accent_swings_present = false;
       STDOUT.print("Accent Swings NOT Detected: ");
     }
   }
-  
   void Deactivate() {
     SetDelegate(NULL);
     A.Free();
     B.Free();
   }
-  
   void Swap() {
     Data C = A;
     A = B;
     B = C;
   }
-  
   // Should only be done when the volume is near zero.
   void PickRandomSwing() {
     if (!on_) return;
@@ -60,15 +57,14 @@ public:
     float t1_offset = random(1000) / 1000.0 * 50 + 10;
     A.SetTransition(t1_offset, smooth_swing_config.Transition1Degrees);
     B.SetTransition(t1_offset + 180.0,
-           smooth_swing_config.Transition2Degrees);
+                    smooth_swing_config.Transition2Degrees);
   }
-  
   void SB_On() override {
     on_ = true;
     // Starts hum, etc.
     delegate_->SB_On();
     PickRandomSwing();
-    if (!A.player || !B.player ) {
+    if (!A.player || !B.player) {
       STDOUT.println("SmoothSwing V2 cannot allocate wav player.");
     }
   }
@@ -78,13 +74,11 @@ public:
     B.Off();
     delegate_->SB_Off();
   }
-  
   enum class SwingState {
     OFF, // waiting for swing to start
     ON,  // swinging
     OUT, // Waiting for sound to fade out
   };
-  
   void SB_Motion(const Vec3& raw_gyro, bool clear) override {
     if (clear) {
       gyro_filter_.filter(raw_gyro);
@@ -105,8 +99,8 @@ public:
         if (speed < smooth_swing_config.SwingStrengthThreshold) {
 #if 1
           if (monitor.ShouldPrint(Monitoring::MonitorSwings)) {
-           STDOUT.print("speed: ");
-           STDOUT.println(speed);
+            STDOUT.print("speed: ");
+            STDOUT.println(speed);
           }
 #endif
           break;
@@ -114,19 +108,11 @@ public:
         state_ = SwingState::ON;
         
       case SwingState::ON:
-        //check for AccentSwingThreshold, presence of accent swings and if the accent player is stopped (this prevents clipping)
-        if (speed >=smooth_swing_config.AccentSwingSpeedThreshold
-          && accent_swings_present)
-        {
-          //allocate player
-          if(!accent_player_) {
-            accent_player_ = GetFreeWavPlayer();
-          }
-          else {
-            if (!accent_player_->isPlaying()) {
-              accent_player_->PlayOnce(&swng);
-            }
-          }
+        //trigger accent swing
+        if (speed >=smooth_swing_config.AccentSwingSpeedThreshold &&
+            accent_swings_present &&
+            (A.player->isPlaying() || B.player->isPlaying())) {
+          delegate_->StartSwing(&swing, &swng);
         }
         if (speed >= smooth_swing_config.SwingStrengthThreshold * 0.9) {
           float swing_strength =
@@ -136,19 +122,19 @@ public:
           // and set the next transition to be 180 degrees from the one
           // that is done.
           while (A.end() < 0.0) {
-           B.midpoint = A.midpoint + 180.0;
-           Swap();
+            B.midpoint = A.midpoint + 180.0;
+            Swap();
           }
           float accent_volume = 0.0;
           float mixab = 0.0;
           if (A.begin() < 0.0)
-           mixab = clamp(- A.begin() / A.width, 0.0, 1.0);
+            mixab = clamp(- A.begin() / A.width, 0.0, 1.0);
           
           float mixhum =
-            powf(swing_strength, smooth_swing_config.SwingSharpness);
+          powf(swing_strength, smooth_swing_config.SwingSharpness);
           
           hum_volume =
-            1.0 - mixhum * smooth_swing_config.MaximumHumDucking / 100.0;
+          1.0 - mixhum * smooth_swing_config.MaximumHumDucking / 100.0;
           
           mixhum *= smooth_swing_config.MaxSwingVolume;
           
@@ -157,12 +143,11 @@ public:
             A.set_volume(mixhum * mixab);
             B.set_volume(mixhum * (1.0 - mixab));
             //This volume will scale with swing speed but is modulated by AccentSwingVolumeSharpness.
-            if (accent_player_) {
-              accent_volume =
-              powf(swing_strength, smooth_swing_config.AccentSwingVolumeSharpness);
-              accent_volume *= smooth_swing_config.MaxAccentSwingVolume;
-              accent_player_->set_volume(accent_volume);
-              mixhum = mixhum - accent_volume * smooth_swing_config.MaxAccentSwingDucking;
+            if (delegate_->IsSwingPlaying()) {
+              mixhum = delegate_->SetSwingVolume(swing_strength,
+              smooth_swing_config.AccentSwingVolumeSharpness,
+              smooth_swing_config.MaxAccentSwingVolume,
+              smooth_swing_config.MaxAccentSwingDucking, mixhum);
             }
           }
           if (monitor.ShouldPrint(Monitoring::MonitorSwings)) {
@@ -197,13 +182,11 @@ public:
           }
         }
         PickRandomSwing();
-        accent_player_.Free();
         state_ = SwingState::OFF;
     }
     // Must always set hum volume, or fade-out doesn't work.
     delegate_->SetHumVolume(hum_volume);
   }
-  
 private:
   struct Data {
     void set_volume(float v) {
@@ -250,7 +233,6 @@ private:
   };
   Data A;
   Data B;
-  RefPtr<BufferedWavPlayer> accent_player_;
   uint32_t last_random_ = 0;
   bool on_ = false;;
   BoxFilter<Vec3, 3> gyro_filter_;

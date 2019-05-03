@@ -23,7 +23,7 @@
 
 //#define CONFIG_FILE "config/default_proffieboard_config.h"
 //#define CONFIG_FILE "config/proffiesaber.h"
-#define CONFIG_FILE "config/tgs.h"
+#define CONFIG_FILE "config/macesaber.h"
 //#define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
@@ -186,7 +186,7 @@ SnoozeTouch snooze_touch;
 SnoozeBlock snooze_config(snooze_touch, snooze_digital, snooze_timer);
 #endif
 
-const char version[] = "$Id: e6a83aee8c0db6e6bd5c35369f9453f44eee7e80 $";
+const char version[] = "$Id$";
 
 #include "common/state_machine.h"
 #include "common/monitoring.h"
