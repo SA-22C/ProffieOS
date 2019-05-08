@@ -124,9 +124,7 @@ public:
   
   void StartSwing(Effect* monophonic, Effect* polyphonic) override {
     if (polyphonic->files_found()) {
-      if (!IsSwingPlaying()) {
         swing_player_ = PlayPolyphonic(polyphonic);
-      }
     } else {
       PlayMonophonic(monophonic, &hum);
     }
