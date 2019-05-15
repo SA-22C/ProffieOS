@@ -69,10 +69,8 @@ public:
   // 1.0 = kDefaultVolume
   // This is really just for sound fonts.
   virtual void SetHumVolume(float volume) {}
-  virtual void StartSwing(Effect* monophonic, Effect* polyphonic) {}
-  virtual float SetSwingVolume(float swing_strength, float AccentSwingVolumeSharpness,
-  float MaxAccentSwingVolume, float MaxAccentSwingDucking, float mixhum) {}
-  virtual bool IsSwingPlaying() {}
+  virtual void StartSwing() {}
+  virtual void SetSwingVolume(float swing_strength) {}
   
 #define SABERFUN(NAME, TYPED_ARGS, ARGS)                        \
 public:                                                         \
