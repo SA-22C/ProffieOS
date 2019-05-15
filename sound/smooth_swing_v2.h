@@ -108,11 +108,11 @@ public:
         state_ = SwingState::ON;
         
       case SwingState::ON:
-        //trigger accent swing
+        // trigger accent swing
         if (speed >=smooth_swing_config.AccentSwingSpeedThreshold &&
             accent_swings_present &&
             (A.player->isPlaying() || B.player->isPlaying())) {
-          delegate_->StartSwing(&swing, &swng);
+          delegate_->StartSwing();
         }
         if (speed >= smooth_swing_config.SwingStrengthThreshold * 0.9) {
           float swing_strength =
@@ -140,15 +140,10 @@ public:
           
           if (on_) {
             // We need to stop setting the volume when off, or playback may never stop.
+            delegate_->SetSwingVolume(swing_strength);
             A.set_volume(mixhum * mixab);
             B.set_volume(mixhum * (1.0 - mixab));
             //This volume will scale with swing speed but is modulated by AccentSwingVolumeSharpness.
-            if (delegate_->IsSwingPlaying()) {
-              mixhum = delegate_->SetSwingVolume(swing_strength,
-              smooth_swing_config.AccentSwingVolumeSharpness,
-              smooth_swing_config.MaxAccentSwingVolume,
-              smooth_swing_config.MaxAccentSwingDucking, mixhum);
-            }
           }
           if (monitor.ShouldPrint(Monitoring::MonitorSwings)) {
             STDOUT.print("speed: ");
