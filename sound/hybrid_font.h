@@ -7,10 +7,18 @@ public:
     CONFIG_VARIABLE(humStart, 100);
     CONFIG_VARIABLE(volHum, 15);
     CONFIG_VARIABLE(volEff, 16);
+    CONFIG_VARIABLE(ProffieOSSwingSpeedThreshold, 250.0f);
+    CONFIG_VARIABLE(ProffieOSSwingVolumeSharpness, 0.5f);
+    CONFIG_VARIABLE(ProffieOSMaxSwingVolume, 3.0f);
+    CONFIG_VARIABLE(ProffieOSSwingOverlap, 0.6f);
   }
   int humStart;
   int volHum;
   int volEff;
+  float ProffieOSSwingSpeedThreshold;
+  float ProffieOSSwingVolumeSharpness;
+  float ProffieOSMaxSwingVolume;
+  float ProffieOSSwingOverlap;
 };
 
 // Monophonic sound fonts are the most common.
@@ -122,35 +130,36 @@ public:
     }
   }
   
-  void StartSwing(Effect* monophonic, Effect* polyphonic) override {
-    if (polyphonic->files_found()) {
-        swing_player_ = PlayPolyphonic(polyphonic);
-    } else {
-      PlayMonophonic(monophonic, &hum);
-    }
-  }
-  
-  float SetSwingVolume(float swing_strength, float AccentSwingVolumeSharpness, float MaxAccentSwingVolume,
-  float MaxAccentSwingDucking, float mixhum) override {
-    if (IsSwingPlaying()) {
-      float accent_volume = powf(swing_strength, AccentSwingVolumeSharpness) * MaxAccentSwingVolume;
-      swing_player_->set_volume(accent_volume);
-      mixhum = mixhum * MaxAccentSwingDucking;
-      return mixhum;
-    }
-    else return 0.0;
-  }
-  
-  bool IsSwingPlaying() override {
-    if (swing_player_) {
-      if (swing_player_->isPlaying()) {
-        return true;
-      } else {
-        swing_player_.Free();
-        return false;
+  void StartSwing() override {
+    if (!guess_monophonic_) {
+      if (swing_player_) {
+        // avoid overlapping swings, based on value set in ProffieOSSwingOverlap.  Value is
+        // between 0 (no overlap) and 1.0 (full overlap)
+        if (swing_player_->pos() / swing_player_->length() >= config_.ProffieOSSwingOverlap) {
+          RefPtr<BufferedWavPlayer> overlap_swing = swing_player_;
+          swing_player_ = PlayPolyphonic(&swng);
+          overlap_swing->set_fade_time(overlap_swing->length() - overlap_swing->pos());
+          overlap_swing->FadeAndStop();
+          overlap_swing.Free();
+        }
+      }
+      else if (!swing_player_) {
+        swing_player_ = PlayPolyphonic(&swng);
       }
     } else {
-      return false;
+      PlayMonophonic(&swing, &hum);
+    }
+  }
+
+  void SetSwingVolume(float swing_strength) override {
+    if(swing_player_) {
+      if (swing_player_->isPlaying()) {
+        float accent_volume = powf(swing_strength, config_.ProffieOSSwingVolumeSharpness) * config_.ProffieOSMaxSwingVolume;
+        swing_player_->set_volume(accent_volume);
+      }
+      else {
+        swing_player_.Free();
+      }
     }
   }
   
@@ -301,9 +310,11 @@ public:
       if (!swinging_ && state_ != STATE_OFF &&
           !(lockup.files_found() && SaberBase::Lockup())) {
         swinging_ = true;
-        StartSwing(&swing, &swng);
+        StartSwing();
       }
-    } else {
+      float swing_strength = std::min<float>(1.0, speed / config_.ProffieOSSwingSpeedThreshold);
+      SetSwingVolume(swing_strength);
+    } else if (swinging_ && speed <= config_.ProffieOSSwingSpeedThreshold * 0.8) {
       swinging_ = false;
     }
     float vol = 1.0f;
