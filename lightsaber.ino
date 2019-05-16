@@ -1410,7 +1410,7 @@ public:
       case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON):
         SaberBase::DoBlast();
         break;
-      case EVENTID(BUTTON_POWER, EVENT_HELD_MEDIUM, MODE_ON):
+      case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_ON):
         if (!SaberBase::Lockup()) {
           Off();
         }
