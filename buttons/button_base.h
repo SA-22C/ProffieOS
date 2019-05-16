@@ -58,7 +58,7 @@ protected:
             if (millis() - push_millis_ < 500) {
                 saber.Event(button_, EVENT_CLICK_SHORT);
                 short_click = true;
-            } else if (millis() - push_millis_ > 500 && millis() - push_millis_ < 2500){
+            } else if (millis() - push_millis_ > 500 && millis() - push_millis_ < 1500){
                 saber.Event(button_, EVENT_CLICK_LONG);
             }
       } else {
