@@ -141,7 +141,7 @@ public:
           swing_player_->set_fade_time(swing_player_->length() - swing_player_->pos());
           swing_player_->FadeAndStop();
           swing_player_.Free();
-          swing_player_->PlayPolyphonic(&swng);
+          swing_player_ = PlayPolyphonic(&swng);
         }
       }
       else if (!swing_player_) {
