@@ -147,7 +147,6 @@ public:
       }
       else if (!swing_player_) {
         swing_player_ = PlayPolyphonic(&swng);
-        swing_player_->set_volume_now(0);
       }
     } else {
       PlayMonophonic(&swing, &hum);
@@ -158,6 +157,7 @@ public:
     if(swing_player_) {
       if (swing_player_->isPlaying()) {
         float accent_volume = powf(swing_strength, config_.ProffieOSSwingVolumeSharpness) * config_.ProffieOSMaxSwingVolume;
+        swing_player_->set_fade_time(2);
         swing_player_->set_volume(accent_volume);
         mixhum = mixhum - mixhum * (config_.ProffieOSSmoothSwingDucking * swing_strength);
       }
