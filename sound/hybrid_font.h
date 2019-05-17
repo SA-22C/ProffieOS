@@ -138,11 +138,10 @@ public:
         // avoid overlapping swings, based on value set in ProffieOSSwingOverlap.  Value is
         // between 0 (no overlap) and 1.0 (full overlap)
         if (swing_player_->pos() / swing_player_->length() >= config_.ProffieOSSwingOverlap) {
-          RefPtr<BufferedWavPlayer> overlap_swing = swing_player_;
-          swing_player_ = PlayPolyphonic(&swng);
-          overlap_swing->set_fade_time(overlap_swing->length() - overlap_swing->pos());
-          overlap_swing->FadeAndStop();
-          overlap_swing.Free();
+          swing_player_->set_fade_time(swing_player_->length() - swing_player_->pos());
+          swing_player_->FadeAndStop();
+          swing_player_.Free();
+          swing_player_->PlayPolyphonic(&swng);
         }
       }
       else if (!swing_player_) {
