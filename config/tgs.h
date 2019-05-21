@@ -2,9 +2,9 @@
 #include "proffieboard_v1_config.h"
 #define NUM_BLADES 1
 #define NUM_BUTTONS 3
-#define VOLUME 1700
+#define VOLUME 1800
 const unsigned int maxLedsPerStrip = 144;
-#define CLASH_THRESHOLD_G 2.1
+#define CLASH_THRESHOLD_G 3.1
 #define ENABLE_AUDIO
 #define ENABLE_MOTION
 #define ENABLE_WS2811
@@ -14,9 +14,10 @@ const unsigned int maxLedsPerStrip = 144;
 
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
-    { "Light", "tracks/rots.wav",StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Blue,White,200,100,400>,AudioFlicker<Blue,White>,AudioFlicker<Blue,White>>,White,40>,300,800,Black>>(), "Light"},
-    { "Light", "tracks/rots.wav",StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Red,White,200,100,400>,AudioFlicker<Red,White>,AudioFlicker<Red,White>>,White,40>,300,800,Black>>(), "Light"},
-    { "Light", "tracks/rots.wav",StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Green,White,200,100,400>,AudioFlicker<Green,White>,AudioFlicker<Green,White>>,White,40>,300,800,Black>>(), "Light"},
+  { "lightcp", "tracks/kylo.wav",
+    //StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Blinking<Blue, Black,200,500>,White>,Blinking<Blue,Black,50,500>>,White>, 300, 800>>(),
+    //StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Strobe<Black,White,15,1>,White>,AudioFlicker<Strobe<Black,White,15,1>,WHITE>>,White>, 300, 800>>(),
+    StylePtr<InOutHelper<LocalizedClash<Lockup<Blast<AudioFlicker<Blue,Rgb<0,0,150>>,Red,200,800,400>,Gradient<AudioFlicker<Blue,DodgerBlue>,AudioFlicker<Blue,DodgerBlue>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<Blue,DodgerBlue>,AudioFlicker<Blue,DodgerBlue>>,BrownNoiseFlicker<GhostWhite,White,50>>,BrownNoiseFlicker<GhostWhite,Orange,50>,80,50>,300,300,Black>>(), "Lightcp"},
     { "light", "tracks/kylo.wav",
         //StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Blinking<Blue, Black,200,500>,White>,Blinking<Blue,Black,50,500>>,White>, 300, 800>>(),
         //StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Strobe<Black,White,15,1>,White>,AudioFlicker<Strobe<Black,White,15,1>,WHITE>>,White>, 300, 800>>(),
@@ -108,7 +109,7 @@ BladeConfig blades[] = {
      //   SubBlade(3,5, NULL),
      //   SubBlade(6,130, NULL),
      //    CONFIGARRAY(presets) },
-    { 0, WS2811BladePtr<130, WS2811_ACTUALLY_800kHz | WS2811_GRB>(), CONFIGARRAY(presets) },
+    { 0, WS2811BladePtr<126, WS2811_ACTUALLY_800kHz | WS2811_GRB>(), CONFIGARRAY(presets) },
     
 };
 #endif

@@ -22,9 +22,7 @@
 // to use here.
 
 //#define CONFIG_FILE "config/default_proffieboard_config.h"
-//#define CONFIG_FILE "config/proffiesaber.h"
-#define CONFIG_FILE "config/macesaber.h"
-//#define CONFIG_FILE "config/default_proffieboard_config.h"
+#define CONFIG_FILE "config/tgs.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
 // #define CONFIG_FILE "config/graflex_v1_config.h"
@@ -44,7 +42,7 @@
 #include CONFIG_FILE
 #undef CONFIG_TOP
 
-#define ENABLE_DEBUG
+// #define ENABLE_DEBUG
 
 
 //
@@ -455,6 +453,8 @@ EFFECT(blaster);
 EFFECT(lockup);
 EFFECT(poweronf);
 EFFECT(font);   // also polyphonic
+EFFECT(bgnlock); // monophonic and polyphonic begin lock
+EFFECT(endlock); // Plecter endlock support, used for polyphonic name too
 
 // Polyphonic fonts
 EFFECT(blst);
@@ -542,10 +542,7 @@ public:
     CONFIG_VARIABLE(Transition1Degrees, 45.0f);
     CONFIG_VARIABLE(Transition2Degrees, 160.0f);
     CONFIG_VARIABLE(MaxSwingVolume, 3.0f);
-    CONFIG_VARIABLE(AccentSwingSpeedThreshold, 300.0f);
-    CONFIG_VARIABLE(AccentSwingVolumeSharpness, 1.0f);
-    CONFIG_VARIABLE(MaxAccentSwingVolume, 3.0f);
-    CONFIG_VARIABLE(MaxAccentSwingDucking, 1.0f);
+    CONFIG_VARIABLE(AccentSwingSpeedThreshold, 0.0f);
   };
 
   int  Version;
@@ -557,9 +554,6 @@ public:
   float Transition2Degrees;
   float MaxSwingVolume;
   float AccentSwingSpeedThreshold;
-  float AccentSwingVolumeSharpness;
-  float MaxAccentSwingVolume;
-  float MaxAccentSwingDucking;
 };
 
 SmoothSwingConfigFile smooth_swing_config;
@@ -639,6 +633,9 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "functions/int_arg.h"
 #include "functions/sin.h"
 #include "functions/scale.h"
+#include "functions/battery_level.h"
+#include "functions/trigger.h"
+#include "functions/bump.h"
 
 // This macro has a problem with commas, please don't use it.
 #define EASYBLADE(COLOR, CLASH_COLOR) \
@@ -810,9 +807,10 @@ public:
   }
 
   void Off() {
+    if (!SaberBase::IsOn()) return;
     if (SaberBase::Lockup()) {
-      SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
       SaberBase::DoEndLockup();
+      SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
     }
     SaberBase::TurnOff();
     if (unmute_on_deactivation_) {
@@ -993,15 +991,17 @@ public:
   // Called from setup to identify the blade and select the right
   // Blade driver, style and sound font.
   void FindBlade() {
-    float resistor = id();
-
     size_t best_config = 0;
-    float best_err = 1000000.0;
-    for (size_t i = 0; i < sizeof(blades) / sizeof(blades)[0]; i++) {
-      float err = fabsf(resistor - blades[i].ohm);
-      if (err < best_err) {
-        best_config = i;
-        best_err = err;
+    if (NELEM(blades) > 1) {
+      float resistor = id();
+
+      float best_err = 1000000.0;
+      for (size_t i = 0; i < NELEM(blades); i++) {
+        float err = fabsf(resistor - blades[i].ohm);
+        if (err < best_err) {
+          best_config = i;
+          best_err = err;
+        }
       }
     }
     STDOUT.print("blade= ");
@@ -1279,13 +1279,12 @@ protected:
       case EVENT_TWIST: STDOUT.print("Twist"); break;
       case EVENT_CLASH: STDOUT.print("Clash"); break;
       case EVENT_HELD: STDOUT.print("Held"); break;
+      case EVENT_HELD_MEDIUM: STDOUT.print("Held Medium"); break;
       case EVENT_HELD_LONG: STDOUT.print("HeldLong"); break;
-      case EVENT_HELD_MEDIUM: STDOUT.print("HeldMedium"); break;
     }
   }
 
-public:
-  bool Event(enum BUTTON button, EVENT event) {
+  void PrintEvent(enum BUTTON button, EVENT event) {
     STDOUT.print("EVENT: ");
     if (button) {
       PrintButton(button);
@@ -1299,6 +1298,10 @@ public:
     if (SaberBase::IsOn()) STDOUT.print(" ON");
     STDOUT.print(" millis=");    
     STDOUT.println(millis());
+  }
+public:
+  bool Event(enum BUTTON button, EVENT event) {
+    PrintEvent(button, event);
 
 #define EVENTID(BUTTON, EVENT, MODIFIERS) (((EVENT) << 24) | ((BUTTON) << 12) | ((MODIFIERS) & ~(BUTTON)))
     if (SaberBase::IsOn() && aux_on_) {
@@ -1415,11 +1418,6 @@ public:
         break;
       case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON):
         SaberBase::DoBlast();
-        break;
-      case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_ON):
-        if (!SaberBase::Lockup()) {
-          Off();
-        }
         break;
       #endif
       case EVENTID(BUTTON_POWER, EVENT_DOUBLE_CLICK, MODE_ON):
@@ -1557,7 +1555,6 @@ public:
     }
   }
 
-
   bool Parse(const char *cmd, const char* arg) override {
     if (!strcmp(cmd, "id")) {
       id();
@@ -1596,8 +1593,8 @@ public:
         SaberBase::DoBeginLockup();
         STDOUT.println("ON");
       } else {
-        SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
         SaberBase::DoEndLockup();
+        SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
         STDOUT.println("OFF");
       }
       return true;
@@ -1609,8 +1606,8 @@ public:
         SaberBase::DoBeginLockup();
         STDOUT.println("ON");
       } else {
-        SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
         SaberBase::DoEndLockup();
+        SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
         STDOUT.println("OFF");
       }
       return true;
@@ -1912,365 +1909,21 @@ private:
 
 Saber saber;
 
+#include "scripts/v3_test_script.h"
+#include "scripts/proffieboard_test_script.h"
+
 #if 0
 #warning !!! V3 TEST SCRIPT ACTIVE !!!
-
-class V3TestScript : Looper, StateMachine {
-public:
-  const char* name() override { return "Script"; }
-  void Loop() override {
-    STATE_MACHINE_BEGIN();
-    SLEEP(2000);
-    if (fabsf(saber.id() - 125812.5f) > 22687.0f) {
-      STDOUT.println("ID IS WRONG!!!");
-      beeper.Beep(0.5, 2000.0);
-      SLEEP(1000);
-      beeper.Beep(0.5, 2000.0);
-      SLEEP(1000);
-      beeper.Beep(0.5, 2000.0);
-      SLEEP(1000);
-    }
-    CommandParser::DoParse("on", NULL);
-    SLEEP(1000);
-    CommandParser::DoParse("batt", NULL);
-    SLEEP(2000);
-    CommandParser::DoParse("play", "cantina.wav");
-#if 0    
-    while (true) {
-      if (dac.isSilent()) {
-        SLEEP(2000);
-      } else {
-        CommandParser::DoParse("clash", NULL);
-        STDOUT.print("alloced: ");
-        STDOUT.println(mallinfo().uordblks);
-        SLEEP(100);
-      }
-    }
-#endif    
-    STATE_MACHINE_END();
-  }
-  void Run() {
-    state_machine_.reset_state_machine();
-    run_ = true;
-  }
-  bool run_ = false;
-};
-
 V3TestScript script;
 #endif
 
-
 #if 0
-
 #warning !!! PROFFIEBOARD TEST SCRIPT ACTIVE !!!
-
-enum class PinState {
-  Unknown,
-  Unconnected,
-  InputPullup,
-  LowOrInput,
-};
-
-class V4ShortChecker : Looper, StateMachine {
-public:
-  V4ShortChecker() : Looper(), StateMachine() {
-    for (size_t i = 0; i < NELEM(pins_); i++) pins_[i] = PinState::Unknown;
-  }
-  void SetPinState(int pin, PinState state) {
-    pins_[pin] = state;
-  }
-  const char* name() override { return "ShortChecker"; }
-  void fail(const char* error) {
-    STDOUT.print("Short on pin ");
-    STDOUT.print(current_pin);
-    STDOUT.print(" ");
-    STDOUT.println(error);
-    fail_ = true;
-  }
-  void Loop() override {
-    STATE_MACHINE_BEGIN();
-    while(1) {
-      for (current_pin = 0; current_pin < NELEM(pins_); current_pin++) {
-	switch (pins_[current_pin]) {
-	  case PinState::Unknown: // Do nothing
-	    break;
-	  case PinState::Unconnected:
-	    pinMode(current_pin, INPUT_PULLUP);
-	    delayMicroseconds(10);
-	    if (digitalRead(current_pin) != HIGH)
-	      fail("expected high with pullup");
-	    // fall through
-	  case PinState::LowOrInput:
-	    pinMode(current_pin, INPUT_PULLDOWN);
-	    delayMicroseconds(10);
-	    if (digitalRead(current_pin) != LOW)
-	      fail("expected low with pulldown");
-	    break;
-	  case PinState::InputPullup:
-	    pinMode(current_pin, INPUT_PULLDOWN);
-	    delayMicroseconds(10);
-	    if (digitalRead(current_pin) != LOW)
-	      fail("expected low with pulldown");
-	    pinMode(current_pin, INPUT_PULLUP);
-	    delayMicroseconds(10);
-	    if (digitalRead(current_pin) != HIGH)
-	      fail("expected high with pullup");
-	    break;
-	}
-	if (fail_) {
-	  beeper.Beep(0.5, 3000.0);
-	  SLEEP(1000);
-	  beeper.Beep(0.5, 2000.0);
-	  SLEEP(1000);
-	  beeper.Beep(0.5, 3000.0);
-	  SLEEP(1000);
-	  fail_ = false;
-	}
-	SLEEP_MICROS(100);
-      }
-    }
-    STATE_MACHINE_END();
-  }
-private:
-  bool fail_ = false;
-  size_t current_pin;
-  PinState pins_[40];
-};
-
-V4ShortChecker short_checker;
-
-class V4TestScript : Looper, StateMachine {
-public:
-  const char* name() override { return "Script"; }
-  void Loop() override {
-    STATE_MACHINE_BEGIN();
-    short_checker.SetPinState(powerButtonPin, PinState::InputPullup);
-    short_checker.SetPinState(auxPin, PinState::InputPullup);
-    short_checker.SetPinState(aux2Pin, PinState::InputPullup);
-    if (saber.id() > 22687.0f) {
-      STDOUT.println("ID is wrong, should be zero at first!!!");
-      beeper.Beep(0.5, 2000.0);
-      SLEEP(1000);
-      beeper.Beep(0.5, 3000.0);
-      SLEEP(1000);
-      beeper.Beep(0.5, 2000.0);
-      SLEEP(1000);
-    }
-
-    STDOUT.print(" Waiting for battery power ");
-    while (battery_monitor.battery() < 3.5) {
-      SLEEP(300);
-      STDOUT.print(".");
-    }
-    STDOUT.println(" battery found.");
-    EnableBooster();
-    SLEEP(100);
-    if (fabsf(saber.id() - 110000.0f) > 22687.0f) {
-      STDOUT.println("ID IS WRONG (want 2.5 volts)!!!");
-      beeper.Beep(0.5, 2000.0);
-      SLEEP(1000);
-      beeper.Beep(0.5, 2000.0);
-      SLEEP(1000);
-      beeper.Beep(0.5, 2000.0);
-      SLEEP(1000);
-    }
-
-    talkie.Say(spPRESS);
-    talkie.Say(spBUTTON);
-    stm32l4_gpio_pin_configure(GPIO_PIN_PH3,   (GPIO_PUPD_PULLUP | GPIO_OSPEED_HIGH | GPIO_MODE_INPUT));
-    SLEEP(50);
-    while (!stm32l4_gpio_pin_read(GPIO_PIN_PH3)) YIELD();
-
-    short_checker.SetPinState(powerButtonPin, PinState::Unknown);
-    talkie.Say(spPRESS);
-    talkie.Say(spPOWER);
-    talkie.Say(spBUTTON);
-    SLEEP(50);
-    while (digitalRead(powerButtonPin) == HIGH) YIELD();
-    SLEEP(50); // Debounce
-    while (digitalRead(powerButtonPin) == LOW) YIELD();
-    SLEEP(50); // Debounce
-    short_checker.SetPinState(powerButtonPin, PinState::InputPullup);
-
-    short_checker.SetPinState(auxPin, PinState::Unknown);
-    talkie.Say(spPRESS);
-    talkie.Say(spBUTTON);
-    talkie.Say(spONE);
-    SLEEP(50);
-    while (digitalRead(auxPin) == HIGH) YIELD();
-    SLEEP(50);
-    while (digitalRead(auxPin) == LOW) YIELD();
-    SLEEP(50);
-    short_checker.SetPinState(auxPin, PinState::InputPullup);
-
-    short_checker.SetPinState(aux2Pin, PinState::Unknown);
-    talkie.Say(spPRESS);
-    talkie.Say(spBUTTON);
-    talkie.Say(spTWO);
-    SLEEP(50);
-    while (digitalRead(aux2Pin) == HIGH) YIELD();
-    SLEEP(50);
-    while (digitalRead(aux2Pin) == LOW) YIELD();
-    SLEEP(50);
-    short_checker.SetPinState(aux2Pin, PinState::InputPullup);
-
-    CommandParser::DoParse("play", "cantina.wav");
-    STATE_MACHINE_END();
-  }
-};
-
-class Blinker1 : Looper, StateMachine {
-public:
-  const char* name() override { return "Blinker1"; }
-  void Loop() override {
-    STATE_MACHINE_BEGIN();
-    while (true) {
-#define TESTPIN2(X, DEFAULT_STATE) do {			\
-    short_checker.SetPinState(X, PinState::Unknown);	\
-    pinMode(X, OUTPUT);					\
-    digitalWrite(X, HIGH);				\
-    SLEEP(200);						\
-    digitalWrite(X, LOW);				\
-    short_checker.SetPinState(X, DEFAULT_STATE); \
-  } while(0);
-
-#define TESTPIN(X) TESTPIN2(X, PinState::LowOrInput)      
-
-      TESTPIN(bladePowerPin1);
-      TESTPIN(bladePowerPin2);
-      TESTPIN(bladePowerPin3);
-      TESTPIN(bladePowerPin4);
-      TESTPIN(bladePowerPin5);
-      TESTPIN(bladePowerPin6);
-    }
-    STATE_MACHINE_END();
-  }
-};
-
-class Blinker2 : Looper, StateMachine {
-public:
-  const char* name() override { return "Blinker2"; }
-  void Loop() override {
-    STATE_MACHINE_BEGIN();
-    while (true) {
-      TESTPIN2(bladePin, PinState::Unknown); // hooked up to 10k voltage divider
-      TESTPIN2(blade2Pin, PinState::Unknown); // hooked up to neopixels
-      TESTPIN(blade3Pin);
-      TESTPIN(blade4Pin);
-      TESTPIN(blade7Pin);
-      TESTPIN(blade6Pin);
-      TESTPIN(blade5Pin);
-    }
-    STATE_MACHINE_END();
-  }
-};
-
-class CapTest : Looper, StateMachine {
-public:
-  const char* name() override { return "CapTest"; }
-  void Loop() override {
-    STATE_MACHINE_BEGIN();
-    while (true) {
-      pinMode(20, INPUT_PULLDOWN);
-      SLEEP(100);
-      pinMode(20, INPUT_PULLUP);
-      last_eq_ = start_ = micros();
-      first_ne_ = start_ + 10000;
-      while (true) {
-	if (digitalRead(20) == LOW) {
-	  last_eq_ = micros();
-	  if (last_eq_ - start_ > 10000) break;
-	} else {
-	  first_ne_ = micros();
-	  break;
-	}
-	YIELD();
-      }
-
-      if (first_ne_ - start_ < 2000 || last_eq_ - start_ > 6000) {
-        STDOUT.print("CAP FAIL LOW-HIGH! ");
-        STDOUT.print(last_eq_ - start_);
-        STDOUT.print(" ");
-        STDOUT.println(first_ne_ - start_);
-        loops_ = 10000;
-        beeper.Beep(0.5, 2000.0);
-        SLEEP(1000);
-        beeper.Beep(0.5, 2000.0);
-        SLEEP(1000);
-        beeper.Beep(0.5, 3000.0);
-        SLEEP(1000);
-      }
-
-      SLEEP(100);
-      pinMode(20, INPUT_PULLDOWN);
-      last_eq_ = start_ = micros();
-      first_ne_ = start_ + 10000;
-      while (true) {
-	if (digitalRead(20) == HIGH) {
-	  last_eq_ = micros();
-	  if (last_eq_ - start_ > 10000) break;
-	} else {
-	  first_ne_ = micros();
-	  break;
-	}
-	YIELD();
-      }
-
-      if (first_ne_ - start_ < 2000 || last_eq_ - start_ > 6000) {
-        STDOUT.print("CAP FAIL HIGH-LOW! ");
-        STDOUT.print(last_eq_ - start_);
-        STDOUT.print(" ");
-        STDOUT.println(first_ne_ - start_);
-        loops_ = 10000;
-        beeper.Beep(0.5, 2000.0);
-        SLEEP(1000);
-        beeper.Beep(0.5, 2000.0);
-        SLEEP(1000);
-        beeper.Beep(0.5, 3000.0);
-        SLEEP(1000);
-      }
-      if (loops_++ == 20) {
-        STDOUT.println("Cap OK");
-      }
-    }
-    STATE_MACHINE_END();
-  }
-  void Run() {
-    state_machine_.reset_state_machine();
-  }
-  int loops_ = 0;
-  uint32_t start_, last_eq_, first_ne_;
-};
-
-// Preparations:
-// 1) In one window, start openocd:
-//    cd .arduino15/packages/grumpyoldpizza/hardware/stm32l4/0.0.26
-//    ./tools/linux/openocd/bin/openocd -s tools/share/openocd/scripts/ -f  ./variants/STM32L433CC-Butterfly/openocd_scripts/stm32l433cc_butterfly.cfg
-// 2) In a second window:
-//    tail -f /var/log/kern.log
-// 3) Start up arduino
-// 4) Hook up multimeter to test board and set it to beep on short
-//
-// For each board:
-// A) Insert SD, put board on tester, plug in USB
-// B) Check that openocd connects and that kernel window says STM32 bootloader
-// C) press reset, make sure STM32 bootloader pops up again
-// D) It should say LOW BATTERY repeatedly, no beeps
-// E) Switch to battery power
-// F) Press BOOT
-// G) Press Power button
-// H) Press AUX button
-// I) Press AUX2 button
-// J) verify that all LEDs light up in order
-// H) verify that music is playing
-// I) Switch back to short checking and turn off USB
-
 V4TestScript script;
 Blinker1 blinker1;
 Blinker2 blinker2;
 CapTest captest;
 #endif
-
 
 #include "buttons/latching_button.h"
 #include "buttons/button.h"
@@ -3125,82 +2778,10 @@ SSD1306 display;
 #include "motion/fxos8700.h"
 #include "motion/fxas21002.h"
 
+// Define this to record clashes to sd card as CSV files
 // #define CLASH_RECORDER
 
-#ifdef CLASH_RECORDER
-class ClashRecorder : public SaberBase {
-public:
-  void SB_Clash() override {
-    time_to_dump_ = NELEM(buffer_) / 2;
-    STDOUT.println("dumping soon...");
-    SaberBase::RequestMotion();
-  }
-  void SB_Accel(const Vec3& accel, bool clear) override {
-    SaberBase::RequestMotion();
-    loop_counter_.Update();
-    buffer_[pos_] = accel;
-    pos_++;
-    if (pos_ == NELEM(buffer_)) pos_ = 0;
-    if (!time_to_dump_) return;
-    time_to_dump_--;
-    if (time_to_dump_) return;
-
-    LOCK_SD(true);
-    char file_name[16];
-    size_t file_num = last_file_ + 1;
-
-    while (true) {
-      char num[16];
-      itoa(file_num, num, 10);
-      strcpy(file_name, "CLS");
-      while(strlen(num) + strlen(file_name) < 8) strcat(file_name, "0");
-      strcat(file_name, num);
-      strcat(file_name, ".CSV");
-          
-      int last_skip = file_num - last_file_;
-      if (LSFS::Exists(file_name)) {
-	last_file_ = file_num;
-	file_num += last_skip * 2;
-	continue;
-      }
-
-      if (file_num - last_file_ > 1) {
-	file_num = last_file_ + last_skip / 2;
-	continue;
-      }
-      break;
-    }
-    File f = LSFS::OpenForWrite(file_name);
-    for (size_t i = 0; i < NELEM(buffer_); i++) {
-      const Vec3& v = buffer_[(pos_ + i) % NELEM(buffer_)];
-      f.print(v.x);
-      f.print(", ");
-      f.print(v.y);
-      f.print(", ");
-      f.print(v.z);
-      f.print("\n");
-    }
-    f.close();
-    LOCK_SD(false);
-    STDOUT.print("Clash dumped to ");
-    STDOUT.print(file_name);
-    STDOUT.print(" ~ ");
-    loop_counter_.Print();
-    STDOUT.println(" measurements / second");
-  }
-private:
-  size_t last_file_ = 0;
-  size_t time_to_dump_ = 0;
-  size_t pos_ = 0;
-  Vec3 buffer_[512];
-  LoopCounter loop_counter_;
-};
-
-ClashRecorder clash_recorder;
-void DumpClash() { clash_recorder.SB_Clash(); }
-#else
-void DumpClash() {}
-#endif
+#include "scripts/clash_recorder.h"
 
 #ifdef GYRO_CLASS
 // Can also be gyro+accel.
@@ -3295,71 +2876,6 @@ void setup() {
   }
 #endif // ENABLE_AUDIO && ENABLE_SD
 }
-
-#if 0
-extern "C" void startup_early_hook(void) {
-#ifdef ENABLE_WATCHDOG
-  // The next 2 lines sets the time-out value. This is the value that the watchdog timer compares itself to
-  WDOG_TOVALL = 1000;
-  WDOG_TOVALH = 0;
-  WDOG_STCTRLH = (WDOG_STCTRLH_ALLOWUPDATE | WDOG_STCTRLH_WDOGEN |
-                  WDOG_STCTRLH_STOPEN |
-                  WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN); // Enable WDG
-  WDOG_PRESC = 0; // prescaler
-#elif defined(KINETISK)
-        WDOG_STCTRLH = WDOG_STCTRLH_ALLOWUPDATE;
-#elif defined(KINETISL)
-        SIM_COPC = 0;  // disable the watchdog
-#endif
-        // enable clocks to always-used peripherals
-#if defined(__MK20DX128__)
-        SIM_SCGC5 = 0x00043F82;         // clocks active to all GPIO
-        SIM_SCGC6 = SIM_SCGC6_RTC | SIM_SCGC6_FTM0 | SIM_SCGC6_FTM1 | SIM_SCGC6_ADC0 | SIM_SCGC6_FTFL;
-#elif defined(__MK20DX256__)
-        SIM_SCGC3 = SIM_SCGC3_ADC1 | SIM_SCGC3_FTM2;
-        SIM_SCGC5 = 0x00043F82;         // clocks active to all GPIO
-        SIM_SCGC6 = SIM_SCGC6_RTC | SIM_SCGC6_FTM0 | SIM_SCGC6_FTM1 | SIM_SCGC6_ADC0 | SIM_SCGC6_FTFL;
-#elif defined(__MK64FX512__) || defined(__MK66FX1M0__)
-        SIM_SCGC3 = SIM_SCGC3_ADC1 | SIM_SCGC3_FTM2 | SIM_SCGC3_FTM3;
-        SIM_SCGC5 = 0x00043F82;         // clocks active to all GPIO
-        SIM_SCGC6 = SIM_SCGC6_RTC | SIM_SCGC6_FTM0 | SIM_SCGC6_FTM1 | SIM_SCGC6_ADC0 | SIM_SCGC6_FTFL;
-        //PORTC_PCR5 = PORT_PCR_MUX(1) | PORT_PCR_DSE | PORT_PCR_SRE;
-        //GPIOC_PDDR |= (1<<5);
-        //GPIOC_PSOR = (1<<5);
-        //while (1);
-#elif defined(__MKL26Z64__)
-        SIM_SCGC4 = SIM_SCGC4_USBOTG | 0xF0000030;
-        SIM_SCGC5 = 0x00003F82;         // clocks active to all GPIO
-        SIM_SCGC6 = SIM_SCGC6_ADC0 | SIM_SCGC6_TPM0 | SIM_SCGC6_TPM1 | SIM_SCGC6_TPM2 | SIM_SCGC6_FTFL;
-#endif
-#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
-        SCB_CPACR = 0x00F00000;
-#endif
-#if defined(__MK66FX1M0__)
-        LMEM_PCCCR = 0x85000003;
-#endif
-}
-#endif
-
-#ifdef ENABLE_WATCHDOG
-class WatchDog : Looper {
-  const char* name() override { return "WatchDog"; }
-  void Loop() override {
-    if (watchdogTimer_ > 5) {
-      watchdogTimer_ = 0;
-      
-      noInterrupts();
-      WDOG_REFRESH = 0xA602;
-      WDOG_REFRESH = 0xB480;
-      interrupts();
-    }
-  };
-
-  elapsedMillis watchdogTimer_;
-};
-
-WatchDog dog;
-#endif
 
 #ifdef MTP_RX_ENDPOINT
 

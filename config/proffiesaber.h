@@ -2,9 +2,9 @@
 #include "proffieboard_v1_config.h"
 #define NUM_BLADES 1
 #define NUM_BUTTONS 2
-#define VOLUME 1800
+#define VOLUME 500
 const unsigned int maxLedsPerStrip = 144;
-#define CLASH_THRESHOLD_G 2.1
+#define CLASH_THRESHOLD_G 3.1
 #define ENABLE_AUDIO
 #define ENABLE_MOTION
 #define ENABLE_WS2811
@@ -15,6 +15,10 @@ const unsigned int maxLedsPerStrip = 144;
 Preset presets[] = {
     { "TeensySF", "tracks/venus.wav",
         StylePtr<InOutHelper<EasyBlade<OnSpark<BrownNoiseFlicker<Strobe<BLACK, White, 50, 1>, Strobe<Cyan, Black, 50, 1>, 50>>, WHITE>, 300, 800> >(), "TeensySF"},
+  { "bank3", "tracks/venus.wav",
+    StylePtr<InOutHelper<EasyBlade<OnSpark<BrownNoiseFlicker<Strobe<BLACK, White, 50, 1>, Strobe<Cyan, Black, 50, 1>, 50>>, WHITE>, 300, 800> >(), "bank3"},
+  { "LS6_NEC", "tracks/venus.wav",
+    StylePtr<InOutHelper<EasyBlade<OnSpark<BrownNoiseFlicker<Strobe<BLACK, White, 50, 1>, Strobe<Cyan, Black, 50, 1>, 50>>, WHITE>, 300, 800> >(), "LS6_NEC"},
    { "Light", "tracks/rots.wav",
    StylePtr<InOutHelper<LocalizedClash<Lockup<Blast<AudioFlicker<Rgb<0,64,255>,Rgb<0,32,128>>,Red,200,800,400>,Gradient<AudioFlicker<DeepSkyBlue,SteelBlue>,AudioFlicker<DeepSkyBlue,SteelBlue>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,SteelBlue>,AudioFlicker<DeepSkyBlue,SteelBlue>>,BrownNoiseFlicker<GhostWhite,Orange,50>>,BrownNoiseFlicker<GhostWhite,White,50>,80,75>,300,300,Black>>(), "Light"},
    { "Graflex8", "tracks/rey.wav",
@@ -48,7 +52,7 @@ Preset presets[] = {
     &style_charging, "Battery\nLevel"}
 };
 BladeConfig blades[] = {
- { 0, WS2811BladePtr<128, WS2811_ACTUALLY_800kHz | WS2811_GRB>(), CONFIGARRAY(presets) },
+ { 0, WS2811BladePtr<130, WS2811_ACTUALLY_800kHz | WS2811_GRB>(), CONFIGARRAY(presets) },
 };
 #endif
 
