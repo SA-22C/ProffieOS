@@ -73,7 +73,7 @@ StylePtr<InOutHelper<Sparkle<Black,White,100,1024>,200,300,Black>>(),"Battery\nL
 };
 BladeConfig blades[] = {
  { 0, WS2811BladePtr<126, WS2811_ACTUALLY_800kHz | WS2811_GRB>(),
- { 0, WS2811BladePtr<126, WS2811_ACTUALLY_800kHz | WS2811_GRB>(), 
+   0, WS2811BladePtr<126, WS2811_ACTUALLY_800kHz | WS2811_GRB>(), 
 SimpleBladePtr<Red3mmLED,NoLED,NoLED,NoLED,bladePowerPin4, -1, -1, -1>(),
 SimpleBladePtr<Red3mmLED,NoLED,NoLED,NoLED,bladePowerPin5, -1, -1, -1>(),
  CONFIGARRAY(presets) },
