@@ -1,6 +1,8 @@
 #ifndef SOUND_EFFECT_H
 #define SOUND_EFFECT_H
 
+#include <algorithm>
+
 class Effect;
 Effect* all_effects = NULL;
 
@@ -95,14 +97,14 @@ class Effect {
     }
 
     int n = -1;
-    if (*rest == '.') {
+    if (*rest == '.' && strlen(rest) == 4) {
       unnumbered_file_found_ = true;
     } else {
       char *end;
       n = strtol(rest, &end, 10);
       if (n <= 0) return false;
-      max_file_ = max(max_file_, n);
-      min_file_ = min(min_file_, n);
+      max_file_ = std::max<int>(max_file_, n);
+      min_file_ = std::min<int>(min_file_, n);
       if (*rest == '0') {
         digits_ = end - rest;
       }
