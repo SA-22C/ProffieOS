@@ -160,7 +160,7 @@ public:
         break;
 
         // Off functions
-      case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_OFF):
+      case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_OFF):
 #if NUM_BUTTONS == 1
         next_preset();
 #endif
