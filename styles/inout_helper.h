@@ -24,7 +24,7 @@ public:
     return true;
   }
   OverDriveColor getColor(int led) {
-    int black_mix = clampi32(thres - led * 256, 0, 255);
+    int black_mix = clampi32(thres - led * 256, 0, 256);
     OverDriveColor ret = base_.getColor(led);
     OverDriveColor off_color  = off_color_.getColor(led);
     ret.c = off_color.c.mix(ret.c, black_mix);
@@ -52,5 +52,8 @@ private:
   
 template<class T, int OUT_MILLIS, int IN_MILLIS, class OFF_COLOR=Rgb<0,0,0> >
   using InOutHelper = InOutHelperX<T, InOutFunc<OUT_MILLIS, IN_MILLIS>, OFF_COLOR>;
+
+template<class T, int OUT_MILLIS, int IN_MILLIS, int EXPLODE_MILLIS, class OFF_COLOR=Rgb<0,0,0> >
+  using InOutHelperTD = InOutHelperX<T, InOutFuncTD<OUT_MILLIS, IN_MILLIS, EXPLODE_MILLIS>, OFF_COLOR>;
 
 #endif

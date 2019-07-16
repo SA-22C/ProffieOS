@@ -7,6 +7,7 @@ template<int PIN, class LED>
 class PWMPin : public PWMPinInterface {
 public:
   void Activate() override {
+    static_assert(PIN >= 0, "PIN is negative?");
     LSanalogWriteSetup(PIN);
     LSanalogWrite(PIN, 0);  // make it black
   }
@@ -32,6 +33,23 @@ public:
   void set_overdrive(const Color16& c) override {}
 };
 
+template<int PIN>
+class PWMPin<PIN, NoLED> : PWMPinInterface {
+public:
+  void Activate() override {}
+  void Deactivate() override {}
+  void set(const Color16& c) override {}
+  void set_overdrive(const Color16& c) override {}
+};
+
+template<>
+class PWMPin<-1, NoLED> : PWMPinInterface {
+public:
+  void Activate() override {}
+  void Deactivate() override {}
+  void set(const Color16& c) override {}
+  void set_overdrive(const Color16& c) override {}
+};
 template<class ... LEDS>
 class MultiChannelLED {};
 
@@ -77,6 +95,7 @@ public:
   static const size_t size = 0;
   void InitArray(PWMPinInterface** pos) {}
   void Activate() {}
+  void Deactivate() {}
 };
 
 template<class LED, class... LEDS>
@@ -90,6 +109,10 @@ public:
   void Activate() {
     led_.Activate();
     rest_.Activate();
+  }
+  void Deactivate() {
+    led_.Deactivate();
+    rest_.Deactivate();
   }
 private:
   LED led_;
@@ -113,11 +136,21 @@ public:
 
   void Activate() override {
     STDOUT.println("Simple Blade");
-    power_ = true;
-    led_structs_.Activate();
+    Power(true);
     CommandParser::Link();
     Looper::Link();
     AbstractBlade::Activate();
+  }
+
+  void Power(bool on) {
+    if (power_ != on) {
+      if (on) {
+	led_structs_.Activate();
+      } else {
+	led_structs_.Deactivate();
+      }
+      power_ = on;
+    }
   }
 
   // BladeBase implementation
@@ -136,11 +169,11 @@ public:
   }
 
   void allow_disable() override {
-    if (!on_) power_ = false;
+    if (!on_) Power(false);
   }
   virtual void SetStyle(BladeStyle* style) {
+    Power(true);
     AbstractBlade::SetStyle(style);
-    power_ = true;
   }
 
   // SaberBase implementation
@@ -150,10 +183,11 @@ public:
   void SB_On() override {
     AbstractBlade::SB_On();
     battery_monitor.SetLoad(true);
-    power_ = on_ = true;
+    on_ = true;
+    Power(true);
   }
-  void SB_Off() override {
-    AbstractBlade::SB_Off();
+  void SB_Off(OffType off_type) override {
+    AbstractBlade::SB_Off(off_type);
     battery_monitor.SetLoad(false);
     on_ = false;
   }
@@ -161,12 +195,12 @@ public:
   bool Parse(const char* cmd, const char* arg) override {
     if (!strcmp(cmd, "blade")) {
       if (!strcmp(arg, "on")) {
-         SB_On();
-         return true;
+        SB_On();
+        return true;
       }
       if (!strcmp(arg, "off")) {
-         SB_Off();
-         return true;
+        SB_Off(OFF_NORMAL);
+        return true;
       }
     }
     return false;

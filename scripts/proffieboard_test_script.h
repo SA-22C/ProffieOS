@@ -86,7 +86,7 @@ public:
     short_checker.SetPinState(powerButtonPin, PinState::InputPullup);
     short_checker.SetPinState(auxPin, PinState::InputPullup);
     short_checker.SetPinState(aux2Pin, PinState::InputPullup);
-    if (saber.id() > 22687.0f) {
+    if (prop.id() > 22687.0f) {
       STDOUT.println("ID is wrong, should be zero at first!!!");
       beeper.Beep(0.5, 2000.0);
       SLEEP(1000);
@@ -104,7 +104,7 @@ public:
     STDOUT.println(" battery found.");
     EnableBooster();
     SLEEP(100);
-    if (fabsf(saber.id() - 110000.0f) > 22687.0f) {
+    if (fabsf(prop.id() - 110000.0f) > 22687.0f) {
       STDOUT.println("ID IS WRONG (want 2.5 volts)!!!");
       beeper.Beep(0.5, 2000.0);
       SLEEP(1000);
@@ -196,7 +196,9 @@ public:
       TESTPIN2(blade2Pin, PinState::Unknown); // hooked up to neopixels
       TESTPIN(blade3Pin);
       TESTPIN(blade4Pin);
+#if VERSION_MAJOR == 4      
       TESTPIN(blade7Pin);
+#endif
       TESTPIN(blade6Pin);
       TESTPIN(blade5Pin);
     }

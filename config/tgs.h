@@ -2,7 +2,7 @@
 #include "proffieboard_v1_config.h"
 #define NUM_BLADES 1
 #define NUM_BUTTONS 3
-#define VOLUME 1800
+#define VOLUME 1700
 const unsigned int maxLedsPerStrip = 144;
 #define CLASH_THRESHOLD_G 3.1
 #define ENABLE_AUDIO
@@ -22,6 +22,8 @@ Preset presets[] = {
         //StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Blinking<Blue, Black,200,500>,White>,Blinking<Blue,Black,50,500>>,White>, 300, 800>>(),
         //StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Strobe<Black,White,15,1>,White>,AudioFlicker<Strobe<Black,White,15,1>,WHITE>>,White>, 300, 800>>(),
         StylePtr<InOutHelper<LocalizedClash<Lockup<Blast<AudioFlicker<Blue,Rgb<0,0,150>>,Red,200,800,400>,Gradient<AudioFlicker<Blue,DodgerBlue>,AudioFlicker<Blue,DodgerBlue>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<Blue,DodgerBlue>,AudioFlicker<Blue,DodgerBlue>>,BrownNoiseFlicker<GhostWhite,White,50>>,BrownNoiseFlicker<GhostWhite,Orange,50>,80,50>,300,300,Black>>(), "Light"},
+  { "LSword", "tracks/kylo.wav",
+    StylePtr<InOutHelper<SimpleClash<Lockup<Blast<AudioFlicker<AliceBlue, DeepSkyBlue>, Red>,AudioFlicker<White, DeepSkyBlue>>,White>, 300, 800>>(), "LSword"},
     { "balance", "tracks/venus.wav",
         //StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Blinking<Blue, Black,200,500>,White>,Blinking<Blue,Black,50,500>>,White>, 300, 800>>(),
         //StylePtr<InOutHelper<SimpleClash<Lockup<Blast<Strobe<Black,White,15,1>,White>,AudioFlicker<Strobe<Black,White,15,1>,WHITE>>,White>, 300, 800>>(),
@@ -109,7 +111,7 @@ BladeConfig blades[] = {
      //   SubBlade(3,5, NULL),
      //   SubBlade(6,130, NULL),
      //    CONFIGARRAY(presets) },
-    { 0, WS2811BladePtr<126, WS2811_ACTUALLY_800kHz | WS2811_GRB>(), CONFIGARRAY(presets) },
+    { 0, WS2811BladePtr<128, WS2811_ACTUALLY_800kHz | WS2811_GRB>(), CONFIGARRAY(presets) },
     
 };
 #endif

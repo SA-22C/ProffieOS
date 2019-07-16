@@ -85,7 +85,7 @@ Preset presets[] = {
 };
 BladeConfig blades[] = {
     { 0, WS2811BladePtr<130, WS2811_ACTUALLY_800kHz | WS2811_GRB>(),
-        SubBlade(0,1, WS2811BladePtr<2, WS2811_800kHz, 8, PowerPINS<bladePowerPin6> >()),
+        SubBlade(0,1, WS2811BladePtr<144, WS2811_800kHz, 8, PowerPINS<bladePowerPin6> >()),
         SubBlade(1,2, NULL)
         , CONFIGARRAY(presets) },
 };

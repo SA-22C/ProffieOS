@@ -26,7 +26,16 @@ public:
       accent_swings_present = true;
     } else {
       accent_swings_present = false;
-      STDOUT.print("Accent Swings NOT Detected: ");
+      STDOUT.println("Accent Swings NOT Detected: ");
+    }
+    if (slsh.files_found() > 0 && smooth_swing_config.AccentSlashAccelerationThreshold > 0.0) {
+      STDOUT.println("Accent Slashes Enabled.");
+      STDOUT.print("Polyphonic slashes: ");
+      STDOUT.println(slsh.files_found());
+      accent_slashes_present = true;
+    } else {
+      accent_slashes_present = false;
+      STDOUT.println("Accent Slashes NOT Detected: ");
     }
   }
 
@@ -73,11 +82,11 @@ public:
       STDOUT.println("SmoothSwing V2 cannot allocate wav player.");
     }
   }
-  void SB_Off() override {
+  void SB_Off(OffType off_type) override {
     on_ = false;
     A.Off();
     B.Off();
-    delegate_->SB_Off();
+    delegate_->SB_Off(off_type);
   }
 
   enum class SwingState {
@@ -116,10 +125,10 @@ public:
         
       case SwingState::ON:
         // trigger accent swing
-        if (speed >=smooth_swing_config.AccentSwingSpeedThreshold &&
-            accent_swings_present &&
+        if (accent_swings_present &&
             (A.player->isPlaying() || B.player->isPlaying())) {
-          delegate_->StartSwing();
+          delegate_->StartSwing(gyro, smooth_swing_config.AccentSwingSpeedThreshold,
+          smooth_swing_config.AccentSlashAccelerationThreshold);
         }
         if (speed >= smooth_swing_config.SwingStrengthThreshold * 0.9) {
           float swing_strength =
@@ -237,10 +246,14 @@ private:
   uint32_t last_random_ = 0;
   bool on_ = false;;
   bool accent_swings_present = false;
+  bool accent_slashes_present = false;
   BoxFilter<Vec3, 3> gyro_filter_;
   int swings_;
   uint32_t last_micros_;
   SwingState state_ = SwingState::OFF;;
+  float swing_acceleration_ = 0.0;
+  int last_swing_millis_ = 0;
+  float last_speed_ = 0.0;
 };
 
 #endif
