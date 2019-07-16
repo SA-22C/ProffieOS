@@ -150,10 +150,6 @@ public:
     last_speed_ = speed;
     float filter_factor = powf(0.01, delta);
     swing_acceleration_ = swing_acceleration_ * filter_factor + current_acceleration * (1 - filter_factor);
-    if (swing_acceleration_ > slashThreshold_ && slsh.files_found()) {
-      doSlash_ = true;
-      swinging_ = true;
-    }
     if (speed > swingThreshold_) {
       if (!guess_monophonic_) {
         if (swing_player_) {
@@ -171,6 +167,7 @@ public:
           } else if (!swinging_) {
             swing_player_ = PlayPolyphonic(&swng);
           }
+          STDOUT.println(swing_acceleration_);
           swinging_ = true;
         }
       } else if (!swinging_ && speed > swingThreshold_) {
