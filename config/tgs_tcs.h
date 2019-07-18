@@ -1,7 +1,7 @@
 #ifdef CONFIG_TOP
 #include "proffieboard_v1_config.h"
 #define NUM_BLADES 1
-#define NUM_BUTTONS 2
+#define NUM_BUTTONS 1
 #define VOLUME 100
 const unsigned int maxLedsPerStrip = 144;
 #define CLASH_THRESHOLD_G 5.1
@@ -10,10 +10,6 @@ const unsigned int maxLedsPerStrip = 144;
 #define ENABLE_WS2811
 #define ENABLE_SD
 #define USB_CLASS_WEBUSB
-#endif
-
-#ifdef CONFIG_PROP
-#include "../props/saber_shtok_buttons.h"
 #endif
 
 #ifdef CONFIG_PRESETS
