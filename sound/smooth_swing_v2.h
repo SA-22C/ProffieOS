@@ -169,7 +169,9 @@ public:
             STDOUT.print("  mixab: ");
             STDOUT.print(mixab);
             STDOUT.print("  hum_volume: ");
-            STDOUT.println(hum_volume);
+            STDOUT.print(hum_volume);
+            STDOUT.print("  swing_strength: ");
+            STDOUT.println(swing_strength);
           }
           if (on_) {
             // We need to stop setting the volume when off, or playback may never stop.

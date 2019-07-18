@@ -13,7 +13,7 @@ public:
     CONFIG_VARIABLE(Transition2Degrees, 160.0f);
     CONFIG_VARIABLE(MaxSwingVolume, 3.0f);
     CONFIG_VARIABLE(AccentSwingSpeedThreshold, 450.0f);
-    CONFIG_VARIABLE(AccentSlashAccelerationThreshold, 1500.0f);
+    CONFIG_VARIABLE(AccentSlashAccelerationThreshold, 2.3f);
   };
 
   int  Version;

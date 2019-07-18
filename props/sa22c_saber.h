@@ -49,6 +49,7 @@ public:
           aux_on_ = false;
           On();
         }
+        break;
 	return true;
 
       case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_OFF):
@@ -99,17 +100,21 @@ public:
       case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_ON):
         SaberBase::DoBlast();
         break;
+        return true;
 #endif
 #if NUM_BUTTONS == 1
       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON | BUTTON_POWER):
         SaberBase::DoForce();
         break;
+        return true;
       case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_ON):
         StartOrStopTrack();
         break;
+        return true;
       case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON):
         SaberBase::DoBlast();
         break;
+        return true;
 #endif
       case EVENTID(BUTTON_POWER, EVENT_DOUBLE_CLICK, MODE_ON):
         if (millis() - activated_ < 500) {
@@ -131,7 +136,7 @@ public:
 #if NUM_BUTTONS == 0
       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON):
 #endif
-      case EVENTID(BUTTON_POWER, EVENT_HELD_MEDIUM, MODE_ON):
+      case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_ON):
         if (!SaberBase::Lockup()) {
           Off();
         }
@@ -155,12 +160,11 @@ public:
             SaberBase::SetLockup(SaberBase::LOCKUP_NORMAL);
           }
           SaberBase::DoBeginLockup();
-	  return true;
         }
         break;
-
+return true;
         // Off functions
-      case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_OFF):
+      case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_OFF):
 #if NUM_BUTTONS == 1
         next_preset();
 #endif
@@ -188,10 +192,12 @@ public:
 
       case EVENTID(BUTTON_POWER, EVENT_PRESSED, MODE_OFF):
         SaberBase::RequestMotion();
+        break;
 	return true;
 
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_OFF | BUTTON_POWER):
         next_preset();
+        break;
 	return true;
 
 #if NUM_BUTTONS > 1
@@ -225,6 +231,7 @@ public:
 #else
         if (!MODE_VOLUME) {previous_preset();}
 #endif
+        break;
 	return true;
 
 	// Events that needs to be handled regardless of what other buttons

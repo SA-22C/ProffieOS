@@ -7,13 +7,14 @@ public:
     CONFIG_VARIABLE(humStart, 100);
     CONFIG_VARIABLE(volHum, 15);
     CONFIG_VARIABLE(volEff, 16);
-    CONFIG_VARIABLE(ProffieOSSwingSpeedThreshold, 250.0f);
+    CONFIG_VARIABLE(ProffieOSSwingSpeedThreshold, 350.0f);
     CONFIG_VARIABLE(ProffieOSSwingVolumeSharpness, 1.0f);
     CONFIG_VARIABLE(ProffieOSMaxSwingVolume, 3.0f);
     CONFIG_VARIABLE(ProffieOSSwingOverlap, 0.5f);
     CONFIG_VARIABLE(ProffieOSSmoothSwingDucking, 0.0f);
-    CONFIG_VARIABLE(ProffieOSSwingLowerThreshold, 200.0f);
-    CONFIG_VARIABLE(ProffieOSSlashAccelerationThreshold, 700.0f);
+    CONFIG_VARIABLE(ProffieOSSwingLowerThreshold, 125.0f);
+    CONFIG_VARIABLE(ProffieOSSlashAccelerationThreshold, 2.3f);
+    CONFIG_VARIABLE(ProffieOSSpinRotation, 360.0f);
   }
   int humStart;
   int volHum;
@@ -25,6 +26,7 @@ public:
   float ProffieOSSmoothSwingDucking;
   float ProffieOSSwingLowerThreshold;
   float ProffieOSSlashAccelerationThreshold;
+  float ProffieOSSpinRotation;
 };
 
 
@@ -141,15 +143,13 @@ public:
   }
   
   void StartSwing(const Vec3& gyro, float swingThreshold_, float slashThreshold_) override {
-    float speed = sqrtf(gyro.z * gyro.z + gyro.y * gyro.y);
+    float speed = sqrtf(gyro.z * gyro.z + gyro.y * gyro.y) ;
     uint32_t now = micros();
     uint32_t delta_micros = now - last_swing_micros_;
     last_swing_micros_ = now;
     float delta = delta_micros * 0.000001;
-    float current_acceleration = (speed - last_speed_) / delta;
-    last_speed_ = speed;
-    float filter_factor = powf(0.01, delta);
-    swing_acceleration_ = swing_acceleration_ * filter_factor + current_acceleration * (1 - filter_factor);
+    angle_ += 0.98 * gyro.len() * delta;
+    angle_ += 0.02 * accel_.len();
     if (speed > swingThreshold_) {
       if (!guess_monophonic_) {
         if (swing_player_) {
@@ -161,24 +161,63 @@ public:
             swing_player_.Free();
           }
         }
-        if (!swing_player_ ) {
-          if (swing_acceleration_ > slashThreshold_ && slsh.files_found() && slashThreshold_ > 0) {
+        if (!swing_player_) {
+//          STDOUT.print("angles at speed: ");
+//          STDOUT.print(angle_);
+//          STDOUT.print(" accelerometer: ");
+//          STDOUT.print(accel_.len());
+//          STDOUT.print(" X accel: ");
+//          STDOUT.print(accel_.x);
+//          STDOUT.print(" Y accel: ");
+//          STDOUT.print(accel_.y);
+//          STDOUT.print(" Z accel: ");
+//          STDOUT.print(accel_.z);
+//          STDOUT.print(" X gyro: ");
+//          STDOUT.print(gyro.x);
+//          STDOUT.print(" Y gyro: ");
+//          STDOUT.print(gyro.y);
+//          STDOUT.print(" Z gyro: ");
+//          STDOUT.println(gyro.z);
+          if (accel_.len() > slashThreshold_ && slsh.files_found() && !swinging_ && !stabbing_) {
             swing_player_ = PlayPolyphonic(&slsh);
-          } else if (!swinging_) {
+          } else if (!swinging_){
             swing_player_ = PlayPolyphonic(&swng);
           }
-          STDOUT.println(swing_acceleration_);
           swinging_ = true;
         }
-      } else if (!swinging_ && speed > swingThreshold_) {
+        if (swinging_ && angle_ > config_.ProffieOSSpinRotation) {
+          if (spin.files_found()) {
+            PlayPolyphonic(&spin);
+          } else {
+            PlayPolyphonic(&swng);
+          }
+          angle_ = 0;
+        }
+      } else if (!stabbing_ && !swinging_ && speed > swingThreshold_) {
         PlayMonophonic(&swing, &hum);
         swinging_ = true;
+      } else if (swinging_ && angle_ > config_.ProffieOSSpinRotation) {
+        PlayMonophonic(&spin, &hum);
+        angle_ = 0;
       }
-      float swing_strength = std::min<float>(1.0, speed / swingThreshold_);
-      SetSwingVolume(swing_strength, 1.0);
+      if (accel_.x > 3.2 && accel_.y < 0.5 && accel_.z < 0.5 &&
+                speed > config_.ProffieOSSwingLowerThreshold) {
+        if (!stabbing_) {
+          if (stab.files_found()) {
+            SB_Stab();
+            stabbing_ = true;
+            swinging_ = true;
+          }
+        }
+      }
+      swing_strength_ = std::min<float>(1.0, speed / swingThreshold_);
     } else if (speed <= config_.ProffieOSSwingLowerThreshold) {
       swinging_ = false;
       swing_player_.Free();
+      angle_ = 0;
+      if (speed <= config_.ProffieOSSwingLowerThreshold /2) {
+        stabbing_ = false;
+      }
     }
     float vol = 1.0f;
     if (!swinging_) {
@@ -396,12 +435,17 @@ public:
   }
   
   bool swinging_ = false;
-  bool doSlash_ = false;
+  bool stabbing_ = false;
   void SB_Motion(const Vec3& gyro, bool clear) override {
     if (state_ != STATE_OFF &&
         !(lockup.files_found() && SaberBase::Lockup())) {
       StartSwing(gyro, config_.ProffieOSSwingSpeedThreshold, config_.ProffieOSSlashAccelerationThreshold);
     }
+    SetSwingVolume(swing_strength_, 1.0);
+  }
+  
+  void SB_Accel(const Vec3& accel, bool clear) override {
+    accel_ = accel;
   }
 
   float GetCurrentEffectLength() const {
@@ -412,14 +456,16 @@ public:
   uint32_t last_micros_;
   uint32_t last_swing_micros_;
   uint32_t hum_start_;
+  uint32_t last_print_micros_ = 0;
   bool monophonic_hum_;
   bool guess_monophonic_;
   IgniterConfigFile config_;
   State state_;
   float volume_;
   float current_effect_length_ = 0.0;
-  float swing_acceleration_;
-  float last_speed_;
+  float angle_;
+  float swing_strength_;
+  Vec3  accel_;
 };
 
 #endif

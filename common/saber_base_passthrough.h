@@ -25,6 +25,10 @@ protected:
 #undef SABERFUN
 
   SaberBase* delegate_ = NULL;
+  
+  void SB_Accel(const Vec3& gyro, bool clear) override {
+    delegate_->SB_Accel(gyro, clear);
+  }
 };
 
 #endif 
