@@ -11,7 +11,7 @@ public:
     CONFIG_VARIABLE(ProffieOSSwingVolumeSharpness, 1.0f);
     CONFIG_VARIABLE(ProffieOSMaxSwingVolume, 3.0f);
     CONFIG_VARIABLE(ProffieOSSwingOverlap, 0.5f);
-    CONFIG_VARIABLE(ProffieOSSmoothSwingDucking, 0.0f);
+    CONFIG_VARIABLE(ProffieOSSmoothSwingDucking, 0.3f);
     CONFIG_VARIABLE(ProffieOSSwingLowerThreshold, 125.0f);
     CONFIG_VARIABLE(ProffieOSSlashAccelerationThreshold, 2.3f);
     CONFIG_VARIABLE(ProffieOSSpinRotation, 360.0f);
@@ -187,9 +187,9 @@ public:
         }
         if (swinging_ && angle_ > config_.ProffieOSSpinRotation) {
           if (spin.files_found()) {
-            PlayPolyphonic(&spin);
+            swing_player_ = PlayPolyphonic(&spin);
           } else {
-            PlayPolyphonic(&swng);
+            swing_player_ = PlayPolyphonic(&swng);
           }
           angle_ = 0;
         }
@@ -204,7 +204,11 @@ public:
                 speed > config_.ProffieOSSwingLowerThreshold) {
         if (!stabbing_) {
           if (stab.files_found()) {
-            SB_Stab();
+            if (!guess_monophonic_) {
+              swing_player_ = PlayPolyphonic(&stab);
+            } else {
+              PlayMonophonic(&stab, &hum);
+            }
             stabbing_ = true;
             swinging_ = true;
           }
@@ -227,12 +231,22 @@ public:
   }
 
   float SetSwingVolume(float swing_strength, float mixhum) override {
+    uint32_t now = micros();
     if(swing_player_) {
       if (swing_player_->isPlaying()) {
         float accent_volume = powf(swing_strength, config_.ProffieOSSwingVolumeSharpness) * config_.ProffieOSMaxSwingVolume;
         swing_player_->set_fade_time(0.04);
         swing_player_->set_volume(accent_volume);
         mixhum = mixhum - mixhum * (config_.ProffieOSSmoothSwingDucking * accent_volume);
+        if (now - last_print_micros_ > 100000) {
+          STDOUT.print("accent_volume: ");
+          STDOUT.print(accent_volume);
+          STDOUT.print(" swing_volume: ");
+          STDOUT.print(swing_player_->volume());
+          STDOUT.print(" mixhum: ");
+          STDOUT.println(mixhum);
+          last_print_micros_ = now;
+        }
       } else {
         swing_player_.Free();
       }
