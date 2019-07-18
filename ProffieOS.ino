@@ -14,7 +14,7 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
+ You should have received a copy of the GNU General Public Licensep
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
@@ -269,7 +269,6 @@ CommandParser* parsers = NULL;
 MonitorHelper monitor_helper;
 
 #include "common/vec3.h"
-#include "common/quat.h"
 #include "common/ref.h"
 #include "common/events.h"
 #include "common/saber_base.h"
@@ -592,7 +591,7 @@ ArgParserInterface* CurrentArgParser;
 #undef CONFIG_PROP
 
 #ifndef PROP_TYPE
-#include "props/saber.h"
+#include "props/saber_sa22c_buttons.h"
 #endif
 
 PROP_TYPE prop;
