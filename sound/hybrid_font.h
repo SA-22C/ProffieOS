@@ -150,6 +150,27 @@ public:
     float delta = delta_micros * 0.000001;
     angle_ += 0.98 * gyro.len() * delta;
     angle_ += 0.02 * accel_.len();
+//    if (now - last_print_micros_ > 100000) {
+//      STDOUT.print("speed: ");
+//      STDOUT.print(speed);
+//      STDOUT.print(" angles at speed: ");
+//     STDOUT.print(angle_);
+//      STDOUT.print(" accelerometer: ");
+//      STDOUT.print(accel_.len());
+//      STDOUT.print(" X accel: ");
+//      STDOUT.print(accel_.x);
+//      STDOUT.print(" Y accel: ");
+//      STDOUT.print(accel_.y);
+//      STDOUT.print(" Z accel: ");
+//      STDOUT.print(accel_.z);
+//      STDOUT.print(" X gyro: ");
+//      STDOUT.print(gyro.x);
+//      STDOUT.print(" Y gyro: ");
+//      STDOUT.print(gyro.y);
+//      STDOUT.print(" Z gyro: ");
+//      STDOUT.println(gyro.z);
+//      last_print_micros_ = now;
+//    }
     if (speed > swingThreshold_) {
       if (!guess_monophonic_) {
         if (swing_player_) {
@@ -162,22 +183,6 @@ public:
           }
         }
         if (!swing_player_) {
-//          STDOUT.print("angles at speed: ");
-//          STDOUT.print(angle_);
-//          STDOUT.print(" accelerometer: ");
-//          STDOUT.print(accel_.len());
-//          STDOUT.print(" X accel: ");
-//          STDOUT.print(accel_.x);
-//          STDOUT.print(" Y accel: ");
-//          STDOUT.print(accel_.y);
-//          STDOUT.print(" Z accel: ");
-//          STDOUT.print(accel_.z);
-//          STDOUT.print(" X gyro: ");
-//          STDOUT.print(gyro.x);
-//          STDOUT.print(" Y gyro: ");
-//          STDOUT.print(gyro.y);
-//          STDOUT.print(" Z gyro: ");
-//          STDOUT.println(gyro.z);
           if (accel_.len() > slashThreshold_ && slsh.files_found() && !swinging_ && !stabbing_) {
             swing_player_ = PlayPolyphonic(&slsh);
           } else if (!swinging_){
@@ -200,8 +205,9 @@ public:
         PlayMonophonic(&spin, &hum);
         angle_ = 0;
       }
-      if (accel_.x > 3.2 && accel_.y < 0.5 && accel_.z < 0.5 &&
-                speed > config_.ProffieOSSwingLowerThreshold) {
+      swing_strength_ = std::min<float>(1.0, speed / swingThreshold_);
+    } else if (speed <= config_.ProffieOSSwingLowerThreshold) {
+      if (accel_.x > 3.0 && accel_.y < 1.5 && accel_.z < 1.5) {
         if (!stabbing_) {
           if (stab.files_found()) {
             if (!guess_monophonic_) {
@@ -210,16 +216,13 @@ public:
               PlayMonophonic(&stab, &hum);
             }
             stabbing_ = true;
-            swinging_ = true;
           }
         }
       }
-      swing_strength_ = std::min<float>(1.0, speed / swingThreshold_);
-    } else if (speed <= config_.ProffieOSSwingLowerThreshold) {
       swinging_ = false;
       swing_player_.Free();
       angle_ = 0;
-      if (speed <= config_.ProffieOSSwingLowerThreshold /2) {
+      if (accel_.x < 2.0) {
         stabbing_ = false;
       }
     }
