@@ -17,6 +17,7 @@ public:
     switch (EVENTID(button, event, modifiers)) {
       case EVENTID(BUTTON_POWER, EVENT_PRESSED, MODE_ON):
       case EVENTID(BUTTON_AUX, EVENT_PRESSED, MODE_ON):
+      case EVENTID(BUTTON_AUX2, EVENT_PRESSED, MODE_ON):
         if (accel_.x < -0.15) {
           pointing_down_ = true;
         } else {
