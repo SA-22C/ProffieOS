@@ -592,7 +592,7 @@ ArgParserInterface* CurrentArgParser;
 #undef CONFIG_PROP
 
 #ifndef PROP_TYPE
-#include "props/saber.h"
+#include "props/sa22c_saber_buttons.h"
 #endif
 
 PROP_TYPE prop;
