@@ -458,6 +458,7 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "styles/rgb_cycle.h"
 #include "styles/clash.h"
 #include "styles/lockup.h"  // Also does "drag"
+#include "styles/stab.h" 
 #include "styles/blast.h"
 #include "styles/strobe.h"
 #include "styles/inout_helper.h"

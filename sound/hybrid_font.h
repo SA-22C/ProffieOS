@@ -216,6 +216,7 @@ public:
               PlayMonophonic(&stab, &hum);
             }
             stabbing_ = true;
+            SaberBase::DoStab();
           }
         }
       }

@@ -15,8 +15,8 @@ const unsigned int maxLedsPerStrip = 144;
 
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
-    { "TeensySF", "tracks/venus.wav",
-        StylePtr<InOutHelper<EasyBlade<OnSpark<BrownNoiseFlicker<Strobe<BLACK, White, 50, 1>, Strobe<Cyan, Black, 50, 1>, 50>>, WHITE>, 300, 800> >(), "TeensySF"},
+    { "bank3", "tracks/venus.wav",
+        StylePtr<InOutHelper<Stab<SimpleClash<Lockup<Blast<OnSpark<BrownNoiseFlicker<Strobe<Black,White,50,1>,Strobe<Cyan,Black,50,1>,50>,White,200>,White,200,100,400>,AudioFlicker<OnSpark<BrownNoiseFlicker<Strobe<Black,White,50,1>,Strobe<Cyan,Black,50,1>,50>,White,200>,White>,AudioFlicker<OnSpark<BrownNoiseFlicker<Strobe<Black,White,50,1>,Strobe<Cyan,Black,50,1>,50>,White,200>,White>>,White,40>,AudioFlicker<White,Blue>,500>,300,800,Black>>(), "bank3"},
    { "Light", "tracks/rots.wav",
    StylePtr<InOutHelper<LocalizedClash<Lockup<Blast<AudioFlicker<Rgb<0,64,255>,Rgb<0,32,128>>,Red,200,800,400>,Gradient<AudioFlicker<DeepSkyBlue,SteelBlue>,AudioFlicker<DeepSkyBlue,SteelBlue>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,White>,AudioFlicker<DeepSkyBlue,SteelBlue>,AudioFlicker<DeepSkyBlue,SteelBlue>>,BrownNoiseFlicker<GhostWhite,Orange,50>>,BrownNoiseFlicker<GhostWhite,White,50>,80,75>,300,300,Black>>(), "Light"},
    { "Graflex8", "tracks/rey.wav",
