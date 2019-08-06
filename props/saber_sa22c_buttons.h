@@ -130,7 +130,7 @@ public:
         if (!SaberBase::Lockup()) {
           Off();
         }
-#endif	
+#endif
 #if NUM_BUTTONS > 1
       case EVENTID(BUTTON_POWER, EVENT_HELD_MEDIUM, MODE_ON):
 #endif
@@ -175,14 +175,14 @@ public:
         StartOrStopTrack();
 #endif
 	return true;
-	
+
       case EVENTID(BUTTON_AUX, EVENT_CLICK_LONG, MODE_OFF):
       current_volume_ = dynamic_mixer.get_volume();
       if (MODE_VOLUME){
         MODE_VOLUME = false;
         beeper.Beep(0.5, 3000);
         STDOUT.println("Exit Volume Menu");
-        
+
       }
       else{
         MODE_VOLUME = true;
@@ -205,6 +205,13 @@ public:
 #endif
         previous_preset();
 	return true;
+      case EVENTID(BUTTON_AUX, EVENT_HELD_LONG, MODE_OFF):
+      talkie.SayDigit((int)floorf(battery_monitor.battery()));
+      talkie.Say(spPOINT);
+      talkie.SayDigit(((int)floorf(battery_monitor.battery() * 10)) % 10);
+      talkie.SayDigit(((int)floorf(battery_monitor.battery() * 100)) % 10);
+      talkie.Say(spVOLTS);
+      return true;
 
       case EVENTID(BUTTON_AUX2, EVENT_CLICK_SHORT, MODE_OFF):
       STDOUT.println(NUM_BUTTONS);
