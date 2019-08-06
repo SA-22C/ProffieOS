@@ -9,7 +9,7 @@ public:
     CONFIG_VARIABLE(volEff, 16);
     CONFIG_VARIABLE(ProffieOSSwingSpeedThreshold, 350.0f);
     CONFIG_VARIABLE(ProffieOSSwingVolumeSharpness, 0.5f);
-    CONFIG_VARIABLE(ProffieOSMaxSwingVolume, 3.0f);
+    CONFIG_VARIABLE(ProffieOSMaxSwingVolume, 2.0f);
     CONFIG_VARIABLE(ProffieOSSwingOverlap, 0.5f);
     CONFIG_VARIABLE(ProffieOSSmoothSwingDucking, 0.2f);
     CONFIG_VARIABLE(ProffieOSSwingLowerThreshold, 125.0f);
