@@ -83,21 +83,21 @@ AccentSlashAccelerationThreshold=2.3
 - :fire:config.ini has 8 settings relevant to swings/spins/stabs for both accent and LEGACY fonts
 
 ProffieOSSwingSpeedThreshold=350.0 
-// speed in deg/sec for LEGACY Plecter/NEC fonts to trigger a swing sound (1 - 999) 
+* // speed in deg/sec for LEGACY Plecter/NEC fonts to trigger a swing sound (1 - 999) 
 ProffieOSSlashAccelerationThreshold=2.3 
-// g-force to trigger LEGACY NEC slashes (0.1 - 4.0)
+* // g-force to trigger LEGACY NEC slashes (0.1 - 4.0)
 ProffieOSSwingVolumeSharpness=0.5
-// volume fade in for swing/slash/spin sounds.  Lower values mean more gradual fade, higher values will be more abrupt (0.1 - 2.0)
+* // volume fade in for swing/slash/spin sounds.  Lower values mean more gradual fade, higher values will be more abrupt (0.1 - 2.0)
 ProffieOSMaxSwingVolume=2.0
-// multiplier of hum volume, uses swing speed to ramp up swing/slash/spin volume to max value. (0.1 - 3.0)
+* // multiplier of hum volume, uses swing speed to ramp up swing/slash/spin volume to max value. (0.1 - 3.0)
 ProffieOSSwingOverlap=0.5
-// how long into a sound before another can overlap it (percentage value, 0.1 - 1.0)
+* // how long into a sound before another can overlap it (percentage value, 0.1 - 1.0)
 ProffieOSSmoothSwingDucking=0.2
-// how much we should duck or lower the volume of the smooth swing pairs during an accent swing/slash/stab (seems to not work as well in this version, should be no higher than 0.2)
+* // how much we should duck or lower the volume of the smooth swing pairs during an accent swing/slash/stab (seems to not work as well in this version, should be no higher than 0.2)
 ProffieOSSwingLowerThreshold=125.0
-// speed in deg/sec the saber must be moving to clear a 'swinging' state.  used to try and limit 'double' swings during long sweeping motions. (should be lower than speed threshold or it will cause issues.  Used for both LEGACY and accent sounds)
+* // speed in deg/sec the saber must be moving to clear a 'swinging' state.  used to try and limit 'double' swings during long sweeping motions. (should be lower than speed threshold or it will cause issues.  Used for both LEGACY and accent sounds)
 ProffieOSSpinRotation=360.0
-//degrees traversed before triggering a spin sound (both LEGACY and accent).  For staff sabers, cutting this value could help give a better 'dual - bladed' effect without having two proffieboards. (0 - 999 but for 1 blade, can't see why you'd change this.  For dual-blades, try 180 or 270)
+* //degrees traversed before triggering a spin sound (both LEGACY and accent).  For staff sabers, cutting this value could help give a better 'dual - bladed' effect without having two proffieboards. (0 - 999 but for 1 blade, can't see why you'd change this.  For dual-blades, try 180 or 270)
 
 For your Stab blade style effect, here are the values:
 Stab(BASE, STAB_COLOR, MILLIS)
