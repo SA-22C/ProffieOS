@@ -73,7 +73,7 @@ AUX2
 * Volume DOWN - short click while OFF and in VOLUME MENU
 
 ### Important Configuration Parameters
-- :fire: smoothsw.ini needs to be present in each font directory and has two settings relevant to accent swings/spins:
+:fire: smoothsw.ini needs to be present in each font directory and has two settings relevant to accent swings/spins:
 
 AccentSwingSpeedThreshold=450.0
 * // speed in deg/sec that the blade needs to be travelling to trigger an accent swings.  Higher numbers mean the saber must be swinging faster to trigger, lower the opposite. (1 - 999)
@@ -81,7 +81,7 @@ AccentSwingSpeedThreshold=450.0
 AccentSlashAccelerationThreshold=2.3
 * // the g-force registered by the accelerometer that, in combination to the speed setting above, causes slashes to trigger rather than swings.  Higher numbers mean slashes trigger less often, lower the opposite. (0.1 - 4.0)
 
-- :fire:config.ini has 8 settings relevant to swings/spins/stabs for both accent and LEGACY fonts
+:fire:config.ini has 8 settings relevant to swings/spins/stabs for both accent and LEGACY fonts
 
 ProffieOSSwingSpeedThreshold=350.0 
 * // speed in deg/sec for LEGACY Plecter/NEC fonts to trigger a swing sound (1 - 999)
