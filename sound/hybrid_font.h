@@ -199,9 +199,11 @@ public:
           angle_ = 0;
         }
       } else if (!stabbing_ && !swinging_ && speed > swingThreshold_) {
+		monophonic_swing_start_ = micros();
         PlayMonophonic(&swing, &hum);
         swinging_ = true;
       } else if (swinging_ && angle_ > config_.ProffieOSSpinRotation) {
+		monophonic_swing_start_ = micros();
         PlayMonophonic(&spin, &hum);
         angle_ = 0;
       }
@@ -213,6 +215,7 @@ public:
             if (!guess_monophonic_) {
               swing_player_ = PlayPolyphonic(&stab);
             } else {
+			  monophonic_swing_start_ = micros();
               PlayMonophonic(&stab, &hum);
             }
             stabbing_ = true;
@@ -236,27 +239,37 @@ public:
 
   float SetSwingVolume(float swing_strength, float mixhum) override {
     uint32_t now = micros();
+	float accent_volume;
     if(swing_player_) {
       if (swing_player_->isPlaying()) {
-        float accent_volume = powf(swing_strength, config_.ProffieOSSwingVolumeSharpness) * config_.ProffieOSMaxSwingVolume;
+        accent_volume = powf(swing_strength, config_.ProffieOSSwingVolumeSharpness) * config_.ProffieOSMaxSwingVolume;
         swing_player_->set_fade_time(0.04);
         swing_player_->set_volume(accent_volume);
         mixhum = mixhum - mixhum * (config_.ProffieOSSmoothSwingDucking * accent_volume);
-        if (now - last_print_micros_ > 100000) {
+      } else {
+        swing_player_.Free();
+      }
+    } else if (monophonic_swing_start_ + current_effect_length_ * 1000000 < millis() ) {
+        accent_volume = powf(swing_strength, config_.ProffieOSSwingVolumeSharpness) * config_.ProffieOSMaxSwingVolume;
+		hum_player_->set_fade_time(0.04);
+		hum_player_->set_volume(accent_volume);
+        mixhum = mixhum - mixhum * (config_.ProffieOSSmoothSwingDucking * accent_volume);
+	}
+    // in the off chance this gets reduced below 0, we don't want to pass a negative number
+    // to the mixer.
+	if (now - last_print_micros_ > 100000) {
           STDOUT.print("accent_volume: ");
           STDOUT.print(accent_volume);
           STDOUT.print(" swing_volume: ");
-          STDOUT.print(swing_player_->volume());
+		  if (swing_player_) {
+			STDOUT.print(swing_player_->volume());
+		  } else {
+			  STDOUT.print(hum_player_->volume());
+		  }
           STDOUT.print(" mixhum: ");
           STDOUT.println(mixhum);
           last_print_micros_ = now;
         }
-      } else {
-        swing_player_.Free();
-      }
-    }
-    // in the off chance this gets reduced below 0, we don't want to pass a negative number
-    // to the mixer.
     if (mixhum > 0) {
       return mixhum;
     } else {
@@ -474,6 +487,7 @@ public:
   uint32_t last_micros_;
   uint32_t last_swing_micros_;
   uint32_t hum_start_;
+  uint32_t monophonic_swing_start_;
   uint32_t last_print_micros_ = 0;
   bool monophonic_hum_;
   bool guess_monophonic_;

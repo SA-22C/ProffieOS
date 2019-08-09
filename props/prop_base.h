@@ -147,7 +147,9 @@ public:
     hybrid_font.Activate();
     font = &hybrid_font;
     if (font) {
-      if (swingl.files_found()) {
+	  if (lswing.files_found()) {
+		  smooth_swing_v2.Activate(font);
+	  } else if (swingl.files_found()) {
         smooth_swing_config.ReadInCurrentDir("smoothsw.ini");
         switch (smooth_swing_config.Version) {
           case 1:
@@ -157,7 +159,7 @@ public:
             smooth_swing_v2.Activate(font);
             break;
         }
-      }
+      } 
     }
 //    EnableBooster();
 #endif
