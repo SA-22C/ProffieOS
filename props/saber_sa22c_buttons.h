@@ -222,7 +222,7 @@ public:
 #if NUM_BUTTONS == 3
         if (MODE_VOLUME){
           STDOUT.println("Volume Down");
-          if (dynamic_mixer.get_volume() <= max_volume_ && dynamic_mixer.get_volume() > (0.10 * max_volume_)){
+          if (dynamic_mixer.get_volume() > (0.10 * max_volume_)){
             current_volume_ = dynamic_mixer.get_volume();
             current_volume_ -= (max_volume_ * 0.10) ;
             dynamic_mixer.set_volume(current_volume_);
