@@ -54,7 +54,7 @@ public:
     int current_style = 0;
     if (f->Tell() == 0) preset_num = -1;
     preset_type = PRESET_DISK;
-    
+
     for (; f->Available(); f->skipline()) {
       char variable[33];
       f->skipwhite();
@@ -85,7 +85,7 @@ public:
 	}
 	return false;
       }
-      
+
       if (!strcmp(variable, "name")) {
 	name = f->readString();
 	continue;
@@ -196,7 +196,7 @@ public:
       if (!UpdateINI()) return false;
       if (!OpenPresets(&f, "presets.ini")) return false;
     }
-    
+
     int n = 0;
     while (true) {
       if (Read(&f)) {
@@ -258,6 +258,17 @@ public:
     Clear();
     LOCK_SD(true);
     if (!Load(preset)) Set(preset);
+    if (preset > 0 && preset < current_config->num_presets) {
+      FileReader c;
+      LSFS::Remove("savedpreset.ini");
+      c.Create("savedpreset.ini");
+      char value[2];
+      sprintf(value, "%d", preset);
+      c.write_key_value("preset", value);
+      sprintf(value, "%d", dynamic_mixer.get_volume());
+      c.write_key_value("volume", value);
+      c.Close();
+    }
     LOCK_SD(false);
   }
 };

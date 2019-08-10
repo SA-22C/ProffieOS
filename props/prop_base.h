@@ -32,7 +32,7 @@ public:
 	return true;
       }
     }
-#endif      
+#endif
     return false;
   }
 
@@ -136,7 +136,7 @@ public:
 #endif
 
     strcpy(current_directory, dir);
-    if (strlen(current_directory) && 
+    if (strlen(current_directory) &&
         current_directory[strlen(current_directory)-1] != '/') {
       strcat(current_directory, "/");
     }
@@ -159,7 +159,7 @@ public:
             smooth_swing_v2.Activate(font);
             break;
         }
-      } 
+      }
     }
 //    EnableBooster();
 #endif
@@ -280,7 +280,8 @@ public:
   } while(0);
 
     ONCEPERBLADE(ACTIVATE);
-    SetPreset(0, false);
+    //SetPreset(0, false);
+    ResumePreset();
     return;
 
    bad_blade:
@@ -288,7 +289,34 @@ public:
 #ifdef ENABLE_AUDIO
     talkie.Say(talkie_error_in_15, 15);
     talkie.Say(talkie_blade_array_15, 15);
-#endif    
+#endif
+  }
+
+  void ResumePreset() {
+    FileReader f;
+    CurrentPreset tmp;
+    LOCK_SD(true);
+    if (f.Open("savedpreset.ini")) {
+      for (; f.Available(); f.skipline()) {
+        char variable[33];
+        f.readVariable(variable);
+        if (!variable[0]) continue;
+        if (f.Peek() != '=') continue;
+        f.Read();
+        f.skipwhite();
+        if (!strcmp(variable, "preset")) {
+          SetPreset(f.readIntValue(), false);
+        continue;
+        }
+        if (!strcmp(variable, "volume")) {
+          dynamic_mixer.set_volume(f.readIntValue());
+        }
+      }
+      f.Close();
+    } else {
+      SetPreset(0, false);
+    }
+    LOCK_SD(false);
   }
 
   void SB_Message(const char* text) override {
@@ -328,7 +356,7 @@ public:
       STDOUT.print(clear);
       STDOUT.print(" millis = ");
       STDOUT.println(millis());
-#endif      
+#endif
       Clash();
     }
     if (v > peak) {
@@ -466,7 +494,7 @@ public:
       DoGesture(NO_STROKE);
     }
   }
-  
+
   Vec3 accel_;
 
   void StartOrStopTrack() {
@@ -564,7 +592,7 @@ public:
       PrintButton(current_modifiers);
     }
     if (SaberBase::IsOn()) STDOUT.print(" ON");
-    STDOUT.print(" millis=");    
+    STDOUT.print(" millis=");
     STDOUT.println(millis());
   }
 
@@ -710,7 +738,7 @@ public:
       SD.mkdir(arg);
       return true;
     }
-#endif    
+#endif
     if (!strcmp(cmd, "pwd")) {
       STDOUT.println(current_directory);
       return true;
@@ -771,19 +799,19 @@ public:
     if (!strcmp(cmd, "move_preset") && arg) {
       int32_t pos = strtol(arg, NULL, 0);
       current_preset_.SaveAt(pos);
-      return true;      
+      return true;
     }
 
     if (!strcmp(cmd, "duplicate_preset") && arg) {
       int32_t pos = strtol(arg, NULL, 0);
       current_preset_.preset_num = -1;
       current_preset_.SaveAt(pos);
-      return true;      
+      return true;
     }
 
     if (!strcmp(cmd, "delete_preset") && arg) {
       current_preset_.SaveAt(-1);
-      return true;      
+      return true;
     }
 
     if (!strcmp(cmd, "show_current_preset")) {
@@ -800,7 +828,7 @@ public:
       STDOUT.println(dynamic_mixer.get_volume());
 #else
       STDOUT.println(0);
-#endif      
+#endif
       return true;
     }
     if (!strcmp(cmd, "set_volume") && arg) {
@@ -808,10 +836,10 @@ public:
       int32_t volume = strtol(arg, NULL, 0);
       if (volume >= 0 && volume <= 3000)
         dynamic_mixer.set_volume(volume);
-#endif      
+#endif
       return true;
     }
-    
+
     if (!strcmp(cmd, "mute")) {
       SetMute(true);
       return true;
@@ -824,13 +852,13 @@ public:
       if (!SetMute(true)) SetMute(false);
       return true;
     }
-    
+
     if (!strcmp(cmd, "set_preset") && arg) {
       size_t preset = strtol(arg, NULL, 0);
       SetPreset(preset, true);
       return true;
     }
-    
+
 #ifdef ENABLE_SD
     if (!strcmp(cmd, "list_tracks")) {
       LOCK_SD(true);
@@ -941,9 +969,9 @@ public:
     }
     return false;
   }
-  
+
   virtual bool Event2(enum BUTTON button, EVENT event, uint32_t modifiers) = 0;
-  
+
 protected:
   CurrentPreset current_preset_;
   LoopCounter accel_loop_counter_;

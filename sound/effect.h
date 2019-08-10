@@ -385,6 +385,10 @@ EFFECT(slsh);
 EFFECT(swingl);  // Looped swing, LOW
 EFFECT(swingh);  // Looped swing, HIGH
 
+// Looped swing fonts.  (Plecter CFX)
+EFFECT(lswing);  // Looped swing, LOW
+EFFECT(hswing);  // Looped swing, HIGH
+
 // Drag effect, replaces "lock/lockup" in drag mode if present.
 EFFECT(bgndrag);
 EFFECT(drag);
