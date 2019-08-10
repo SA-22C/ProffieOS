@@ -57,7 +57,7 @@ public:
 #if NUM_BUTTONS == 2
         if (MODE_VOLUME){
           STDOUT.println("Volume Down");
-          if (dynamic_mixer.get_volume() <= max_volume_ && dynamic_mixer.get_volume() > (0.10 * max_volume_)){
+          if (dynamic_mixer.get_volume() > (0.10 * max_volume_)){
             current_volume_ = dynamic_mixer.get_volume();
             current_volume_ -= (max_volume_ * 0.10) ;
             dynamic_mixer.set_volume(current_volume_);
@@ -91,7 +91,7 @@ public:
           On();
 #else
           next_preset();
-		  
+
 #endif
         }
 	return true;
@@ -170,7 +170,7 @@ public:
       case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_OFF):
 #if NUM_BUTTONS == 1
         next_preset();
-		
+
         return true;
 #endif
 #if NUM_BUTTONS > 1
@@ -199,7 +199,7 @@ public:
 
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_OFF | BUTTON_POWER):
         next_preset();
-		
+
 	return true;
 
       case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_OFF | BUTTON_AUX):
@@ -207,7 +207,7 @@ public:
       case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_OFF):
 #endif
         previous_preset();
-		
+
 	return true;
       case EVENTID(BUTTON_AUX, EVENT_HELD_LONG, MODE_OFF):
       talkie.SayDigit((int)floorf(battery_monitor.battery()));
@@ -240,12 +240,12 @@ public:
 #ifdef DUAL_POWER_BUTTONS
         if (!MODE_VOLUME) {
 			next_preset();
-			
+
 		}
 #else
         if (!MODE_VOLUME) {
 			previous_preset();
-			
+
 		}
 #endif
 	return true;
