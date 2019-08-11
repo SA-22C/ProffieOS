@@ -18,9 +18,11 @@ Proffie OS supports:
 * Support forum: http://imperialroyalarms.com/board/97/profezzorns-lab
 
 ### SA-22C Features
+* Saber save state - saber remembers last activated preset and volume level and resumes after sleep/power cut.
 * Plecter fonts - spin and stab effects
 * NEC fonts - slsh effects
 * Smooth Swing V2.1 - Accent effects - spin, swng, slsh, stab layered over the high/low swing pairs
+* CFX Smooth Swing Fonts - automatically detect and activate in hybrid mode, no file renames required.
 * Volume control on the fly
 * Stab blade effect
 * spoken battery command
