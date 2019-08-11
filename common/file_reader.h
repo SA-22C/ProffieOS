@@ -106,7 +106,7 @@ public:
     } else {
       Close();
     }
-#endif    
+#endif
     return false;
   }
   bool Create(const char* filename) {
@@ -118,7 +118,7 @@ public:
       type_ = TYPE_SD;
       return true;
     }
-#endif    
+#endif
     return false;
   }
   bool OpenMem(const uint8_t* data, uint32_t length) {
@@ -191,7 +191,7 @@ public:
 	  return -1;
 	}
       }
-#endif   
+#endif
       case TYPE_MEM:
 	return mem_file_.peek();
     }
@@ -345,9 +345,9 @@ private:
 #ifdef ENABLE_SD
     TYPE_SD,
 #endif
-#ifdef ENABLE_SERIALFLASH    
+#ifdef ENABLE_SERIALFLASH
     TYPE_SF,
-#endif    
+#endif
     TYPE_MEM
   } type_;
   union {

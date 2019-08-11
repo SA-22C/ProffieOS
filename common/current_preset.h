@@ -258,14 +258,14 @@ public:
     Clear();
     LOCK_SD(true);
     if (!Load(preset)) Set(preset);
-    if (preset > 0 && preset < current_config->num_presets) {
+    if (preset >= 0 && preset < current_config->num_presets) {
       FileReader c;
       LSFS::Remove("savedpreset.ini");
       c.Create("savedpreset.ini");
       char value[2];
-      sprintf(value, "%d", preset);
+      itoa(preset, value, 10);
       c.write_key_value("preset", value);
-      sprintf(value, "%d", dynamic_mixer.get_volume());
+      itoa(dynamic_mixer.get_volume(), value, 10);
       c.write_key_value("volume", value);
       c.Close();
     }
