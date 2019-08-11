@@ -60,7 +60,7 @@ public:
       guess_monophonic_ = false;
       STDOUT.print("polyphonic");
     }
-	
+
     STDOUT.println(" font.");
     SaberBase::Link(this);
     SetHumVolume(1.0);
@@ -87,7 +87,7 @@ public:
   RefPtr<BufferedWavPlayer> next_hum_player_;
   RefPtr<BufferedWavPlayer> swing_player_;
   RefPtr<BufferedWavPlayer> lock_player_;
-  
+
   void PlayMonophonic(Effect* f, Effect* loop)  {
     EnableAmplifier();
     if (!next_hum_player_) {
@@ -101,7 +101,7 @@ public:
       hum_player_->set_fade_time(0.003);
       hum_player_->FadeAndStop();
       hum_player_.Free();
-      
+
       next_hum_player_->set_volume_now(0);
       next_hum_player_->set_fade_time(0.003);
       next_hum_player_->set_volume(config_.volEff / 16.0);
@@ -114,7 +114,7 @@ public:
     current_effect_length_ = hum_player_->length();
     if (loop) hum_player_->PlayLoop(loop);
   }
-							   
+
   RefPtr<BufferedWavPlayer> PlayPolyphonic(Effect* f)  {
     EnableAmplifier();
     RefPtr<BufferedWavPlayer> player = GetFreeWavPlayer();
@@ -141,7 +141,7 @@ public:
       PlayPolyphonic(effect);
     }
   }
-  
+
   void StartSwing(const Vec3& gyro, float swingThreshold_, float slashThreshold_) override {
     float speed = sqrtf(gyro.z * gyro.z + gyro.y * gyro.y) ;
     uint32_t now = micros();
@@ -150,27 +150,6 @@ public:
     float delta = delta_micros * 0.000001;
     angle_ += 0.98 * gyro.len() * delta;
     angle_ += 0.02 * accel_.len();
-//    if (now - last_print_micros_ > 100000) {
-//      STDOUT.print("speed: ");
-//      STDOUT.print(speed);
-//      STDOUT.print(" angles at speed: ");
-//     STDOUT.print(angle_);
-//      STDOUT.print(" accelerometer: ");
-//      STDOUT.print(accel_.len());
-//      STDOUT.print(" X accel: ");
-//      STDOUT.print(accel_.x);
-//      STDOUT.print(" Y accel: ");
-//      STDOUT.print(accel_.y);
-//      STDOUT.print(" Z accel: ");
-//      STDOUT.print(accel_.z);
-//      STDOUT.print(" X gyro: ");
-//      STDOUT.print(gyro.x);
-//      STDOUT.print(" Y gyro: ");
-//      STDOUT.print(gyro.y);
-//      STDOUT.print(" Z gyro: ");
-//      STDOUT.println(gyro.z);
-//      last_print_micros_ = now;
-//    }
     if (speed > swingThreshold_) {
       if (!guess_monophonic_) {
         if (swing_player_) {
@@ -257,26 +236,13 @@ public:
 	}
     // in the off chance this gets reduced below 0, we don't want to pass a negative number
     // to the mixer.
-	if (now - last_print_micros_ > 100000) {
-          STDOUT.print("accent_volume: ");
-          STDOUT.print(accent_volume);
-          STDOUT.print(" swing_volume: ");
-		  if (swing_player_) {
-			STDOUT.print(swing_player_->volume());
-		  } else {
-			  STDOUT.print(hum_player_->volume());
-		  }
-          STDOUT.print(" mixhum: ");
-          STDOUT.println(mixhum);
-          last_print_micros_ = now;
-        }
     if (mixhum > 0) {
       return mixhum;
     } else {
       return 0.0;
     }
   }
-  
+
   void SB_On() override {
     if (monophonic_hum_) {
       state_ = STATE_HUM_ON;
@@ -464,7 +430,7 @@ public:
     if (!hum_player_) return;
     hum_player_->set_volume(vol);
   }
-  
+
   bool swinging_ = false;
   bool stabbing_ = false;
   void SB_Motion(const Vec3& gyro, bool clear) override {
@@ -474,7 +440,7 @@ public:
     }
     SetSwingVolume(swing_strength_, 1.0);
   }
-  
+
   void SB_Accel(const Vec3& accel, bool clear) override {
     accel_ = accel;
   }

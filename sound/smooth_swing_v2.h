@@ -12,10 +12,21 @@ public:
   void Activate(SaberBase* base_font) {
     STDOUT.println("Activating SmoothSwing V2");
     SetDelegate(base_font);
-    if (swingl.files_found() != swingh.files_found()) {
-      STDOUT.println("Warning, swingl and swingh should have the same number of files.");
+    if (lswing.files_found()) {
+      STDOUT.println("CFX Font Detected");
+      cfx_smoothswing = true;
+      if (lswing.files_found() != hswing.files_found()) {
+        STDOUT.println("Warning, lswing and hswing should have the same number of files.");
+        swings_ = std::min<size_t>(lswing.files_found(), hswing.files_found());
+      }
+    } else if (swingl.files_found()) {
+      STDOUT.println("Proffie Font Detected");
+      cfx_smoothswing = false;
+      if (swingl.files_found() != swingh.files_found()) {
+        STDOUT.println("Warning, swingl and swingh should have the same number of files.");
+        swings_ = std::min<size_t>(swingl.files_found(), swingh.files_found());
+      }
     }
-    swings_ = std::min<size_t>(swingl.files_found(), swingh.files_found());
     // check for swngxx files to use as accent swings
     if ((swng.files_found() || swing.files_found()) > 0 && smooth_swing_config.AccentSwingSpeedThreshold > 0.0) {
       STDOUT.println("Accent Swings Enabled.");
@@ -36,6 +47,13 @@ public:
     } else {
       accent_slashes_present = false;
       STDOUT.println("Accent Slashes NOT Detected: ");
+    }
+    if (spin.files_found()) {
+      STDOUT.println("Accent Spins Enabled.");
+      STDOUT.print("Spins: ");
+      STDOUT.println(spin.files_found());
+    } else {
+      STDOUT.println("Accent Spins NOT Detected: ");
     }
   }
 
@@ -62,10 +80,17 @@ public:
     float start = m / 1000.0;
     A.Stop();
     B.Stop();
-    swingl.Select(swing);
-    swingh.Select(swing);
-    A.Play(&swingl, start);
-    B.Play(&swingh, start);
+    if (cfx_smoothswing) {
+      lswing.Select(swing);
+      hswing.Select(swing);
+      A.Play(&lswing, start);
+      B.Play(&hswing, start);
+    } else {
+      swingl.Select(swing);
+      swingh.Select(swing);
+      A.Play(&swingl, start);
+      B.Play(&swingh, start);
+    }
     if (random(2)) Swap();
     float t1_offset = random(1000) / 1000.0 * 50 + 10;
     A.SetTransition(t1_offset, smooth_swing_config.Transition1Degrees);
@@ -109,7 +134,7 @@ public:
     if (delta > 1000000) delta = 1;
     last_micros_ = t;
     float hum_volume = 1.0;
-    
+
     switch (state_) {
       case SwingState::OFF:
         if (speed < smooth_swing_config.SwingStrengthThreshold) {
@@ -122,7 +147,7 @@ public:
           break;
         }
         state_ = SwingState::ON;
-        
+
       case SwingState::ON:
         // trigger accent swing
         if (accent_swings_present &&
@@ -249,6 +274,7 @@ private:
   bool on_ = false;;
   bool accent_swings_present = false;
   bool accent_slashes_present = false;
+  bool cfx_smoothswing = false;
   BoxFilter<Vec3, 3> gyro_filter_;
   int swings_;
   uint32_t last_micros_;
