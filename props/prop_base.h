@@ -148,6 +148,7 @@ public:
     font = &hybrid_font;
     if (font) {
 	  if (lswing.files_found()) {
+      smooth_swing_config.ReadInCurrentDir("smoothsw.ini");
 		  smooth_swing_v2.Activate(font);
 	  } else if (swingl.files_found()) {
         smooth_swing_config.ReadInCurrentDir("smoothsw.ini");
@@ -295,8 +296,10 @@ public:
   void ResumePreset() {
     FileReader f;
     CurrentPreset tmp;
+    int newPreset;
+    int newVolume;
     LOCK_SD(true);
-    if (f.Open("savedpreset.ini")) {
+    if (f.Open("savedpreset.ini") && f.FileSize() > 0) {
       for (; f.Available(); f.skipline()) {
         char variable[33];
         f.readVariable(variable);
@@ -305,18 +308,21 @@ public:
         f.Read();
         f.skipwhite();
         if (!strcmp(variable, "preset")) {
-          SetPreset(f.readIntValue(), false);
+          newPreset = f.readIntValue();
         continue;
         }
         if (!strcmp(variable, "volume")) {
-          dynamic_mixer.set_volume(f.readIntValue());
+          newVolume = f.readIntValue();
         }
       }
       f.Close();
+      LOCK_SD(false);
+      SetPreset(newPreset, false);
+      dynamic_mixer.set_volume(newVolume);
     } else {
+      LOCK_SD(false);
       SetPreset(0, false);
     }
-    LOCK_SD(false);
   }
 
   void SB_Message(const char* text) override {
