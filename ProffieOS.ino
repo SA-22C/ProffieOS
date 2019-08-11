@@ -270,6 +270,7 @@ CommandParser* parsers = NULL;
 MonitorHelper monitor_helper;
 
 #include "common/vec3.h"
+#include "common/quat.h"
 #include "common/ref.h"
 #include "common/events.h"
 #include "common/saber_base.h"
@@ -458,7 +459,7 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "styles/rgb_cycle.h"
 #include "styles/clash.h"
 #include "styles/lockup.h"  // Also does "drag"
-#include "styles/stab.h" 
+#include "styles/stab.h"
 #include "styles/blast.h"
 #include "styles/strobe.h"
 #include "styles/inout_helper.h"
@@ -1051,7 +1052,7 @@ class Commands : public CommandParser {
       SCB_AIRCR = 0x05FA0004;
 #else
       STM32.reset();
-#endif 
+#endif
       STDOUT.println("Reset failed.");
       return true;
     }

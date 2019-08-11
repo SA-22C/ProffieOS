@@ -18,14 +18,13 @@ Proffie OS supports:
 * Support forum: http://imperialroyalarms.com/board/97/profezzorns-lab
 
 ### SA-22C Features
-* Save state - saber remembers current preset and volume level across reboot/sleep
-* Plecter fonts - spin and stab effects, plus CFX smooth swing.
+* Plecter fonts - spin and stab effects
 * NEC fonts - slsh effects
 * Smooth Swing V2.1 - Accent effects - spin, swng, slsh, stab layered over the high/low swing pairs
 * Volume control on the fly
 * Stab blade effect
 * spoken battery command
-* 1/2/3 button mods 
+* 1/2/3 button mods
 * button mash control - no false triggers of button holds while rapidly pressing buttons
 
 ### Button functions
@@ -84,10 +83,10 @@ AccentSlashAccelerationThreshold=2.3
 
 :fire:config.ini has 8 settings relevant to swings/spins/stabs for both accent and LEGACY fonts
 
-ProffieOSSwingSpeedThreshold=350.0 
+ProffieOSSwingSpeedThreshold=350.0
 * // speed in deg/sec for LEGACY Plecter/NEC fonts to trigger a swing sound (1 - 999)
 
-ProffieOSSlashAccelerationThreshold=2.3 
+ProffieOSSlashAccelerationThreshold=2.3
 * // g-force to trigger LEGACY NEC slashes (0.1 - 4.0)
 
 ProffieOSSwingVolumeSharpness=0.5
@@ -118,4 +117,3 @@ BASE - the base color of the blade.  Like any other style, this can be any effec
 STAB_COLOR - the color of the stab effect.  Can be any effect just like base color.
 
 MILLIS - duration of the effect.  Just like in/out millis you will want to tune this to match your font.
-
