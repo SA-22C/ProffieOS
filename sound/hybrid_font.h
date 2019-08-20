@@ -15,6 +15,7 @@ public:
     CONFIG_VARIABLE(ProffieOSSwingLowerThreshold, 125.0f);
     CONFIG_VARIABLE(ProffieOSSlashAccelerationThreshold, 2.3f);
     CONFIG_VARIABLE(ProffieOSSpinRotation, 360.0f);
+    CONFIG_VARIABLE(ProffieOSStabAccelerationThreshold, 3.0f);
   }
   int humStart;
   int volHum;
@@ -27,6 +28,7 @@ public:
   float ProffieOSSwingLowerThreshold;
   float ProffieOSSlashAccelerationThreshold;
   float ProffieOSSpinRotation;
+  float ProffieOSStabAccelerationThreshold;
 };
 
 
@@ -188,7 +190,7 @@ public:
       }
       swing_strength_ = std::min<float>(1.0, speed / swingThreshold_);
     } else if (speed <= config_.ProffieOSSwingLowerThreshold) {
-      if (accel_.x > 3.0 && accel_.y < 1.5 && accel_.z < 1.5) {
+      if (accel_.x > config_.ProffieOSStabAccelerationThreshold && accel_.y < 1.5 && accel_.z < 1.5) {
         if (!stabbing_) {
           if (stab.files_found()) {
             if (!guess_monophonic_) {
