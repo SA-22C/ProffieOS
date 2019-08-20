@@ -109,6 +109,9 @@ ProffieOSSwingLowerThreshold=125.0
 ProffieOSSpinRotation=360.0
 * //degrees traversed before triggering a spin sound (both LEGACY and accent).  For staff sabers, cutting this value could help give a better 'dual - bladed' effect without having two proffieboards. (0 - 999 but for 1 blade, can't see why you'd change this.  For dual-blades, try 180 or 270)
 
+ProffieOSStabAccelerationThreshold=3.0
+* //G force required to trigger a stab effect.  Stab effects are triggered while the saber is NOT swinging and the saber is thrust forward with a force greater than the threshold.  Default is 3.0, lower values make stab more responsive, higher values less responsive.  Used for both legacy Plecter AND smoothswing fonts where stab files are present.
+
 
 For your Stab blade style effect, here are the values:
 
