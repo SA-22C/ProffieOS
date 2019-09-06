@@ -18,7 +18,7 @@ Proffie OS supports:
 * Support forum: http://imperialroyalarms.com/board/97/profezzorns-lab
 
 ### SA-22C Features
-* Color/Effect Change On-The-Fly (thanks Fernando Darosa!)
+* Color/Effect Change On-The-Fly, by Fernando Darosa  
 * Saber save state - saber remembers last activated preset and volume level and resumes after sleep/power cut.
 * Plecter fonts - spin and stab effects
 * NEC fonts - slsh effects
