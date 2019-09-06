@@ -93,6 +93,20 @@ struct CreeXPE2RedTemplate {
 
 using CreeXPE2Red = CreeXPE2RedTemplate<>;
 
+template<int milliohms = 1200>
+struct CreeXPE2DRedTemplate {
+  static constexpr float MaxAmps = 1.0;
+  static constexpr float MaxVolts = 2.5;
+  static constexpr float P2Amps = 0.35;
+  static constexpr float P2Volts = 2.1;
+  static constexpr float R = milliohms / 1000.0;
+  static const int Red = 255;
+  static const int Green = 0;
+  static const int Blue = 0;
+};
+
+using CreeXPE2DRed = CreeXPE2DRedTemplate<>;
+
 template<int milliohms = 1000>
 struct CreeXPE2RedOrangeTemplate {
   static constexpr float MaxAmps = 1.0;
@@ -137,17 +151,60 @@ struct CreeXPLTemplate {
 
 using CreeXPL = CreeXPLTemplate<>;
 
-// This is a "superbright 3mm blue led" that I found on ebay.
-// I used this to build an LED string with ~150 LEDs.
-// Since I don't have a proper datasheet, I measured these values.
+// Useful for 3mm and 5mm accent leds:
+
 struct Blue3mmLED {
-  static constexpr float MaxAmps = 0.03 * 150;
-  static constexpr float MaxVolts = 3.4;
-  static constexpr float P2Amps = 0.016 * 150;
-  static constexpr float P2Volts = 3.2;
+  static constexpr float MaxAmps = 0.02;
+  static constexpr float MaxVolts = 3.1;
+  static constexpr float P2Amps = 0.01;
+  static constexpr float P2Volts = 2.9;
   static constexpr float R = 0.05; // assumed wire resistance
   static const int Red = 0;
   static const int Green = 0;
+  static const int Blue = 255;
+};
+
+struct Red3mmLED {
+  static constexpr float MaxAmps = 0.02;
+  static constexpr float MaxVolts = 2.0;
+  static constexpr float P2Amps = 0.01;
+  static constexpr float P2Volts = 1.9;
+  static constexpr float R = 0.05; // assumed wire resistance
+  static const int Red = 255;
+  static const int Green = 0;
+  static const int Blue = 0;
+};
+
+struct Green3mmLED {
+  static constexpr float MaxAmps = 0.02;
+  static constexpr float MaxVolts = 3.1;
+  static constexpr float P2Amps = 0.01;
+  static constexpr float P2Volts = 2.9;
+  static constexpr float R = 0.05; // assumed wire resistance
+  static const int Red = 0;
+  static const int Green = 255;
+  static const int Blue = 0;
+};
+
+struct Yellow3mmLED {
+  static constexpr float MaxAmps = 0.02;
+  static constexpr float MaxVolts = 2.0;
+  static constexpr float P2Amps = 0.01;
+  static constexpr float P2Volts = 1.9;
+  static constexpr float R = 0.05; // assumed wire resistance
+  static const int Red = 255;
+  static const int Green = 255;
+  static const int Blue = 0;
+};
+
+struct White3mmLED {
+  static constexpr float MaxAmps = 0.02;
+  static constexpr float MaxVolts = 3.2;
+  static constexpr float P2Amps = 0.01;
+  static constexpr float P2Volts = 3.0;
+  static constexpr float R = 0.05; // assumed wire resistance
+  static const int Red = 255;
+  static const int Green = 255;
   static const int Blue = 255;
 };
 

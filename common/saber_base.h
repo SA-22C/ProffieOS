@@ -67,6 +67,7 @@ public:
     LOCKUP_NORMAL,
     LOCKUP_DRAG,
     LOCKUP_ARMED,   // For detonators and such
+    LOCKUP_BLOCK,	// Fett263 addition for dual lockup    
   };
   static LockupType Lockup() { return lockup_; }
   static void SetLockup(LockupType lockup) { lockup_ = lockup; }
@@ -94,6 +95,13 @@ public:                                                         \
 #define SABERBASEFUNCTIONS()                     \
   SABERFUN(Clash, (), ());                       \
   SABERFUN(Stab, (), ());                        \
+  SABERFUN(Change, (), ());                      \
+  SABERFUN(MEnter, (), ());						 \
+  SABERFUN(MExit, (), ());						 \
+  SABERFUN(Preset, (), ());                      \
+  SABERFUN(Scroll, (), ());                      \
+  SABERFUN(Select, (), ());                      \
+  SABERFUN(MSelect, (), ());					 \
   SABERFUN(On, (), ());                          \
   SABERFUN(Off, (OffType off_type), (off_type)); \
   SABERFUN(Force, (), ());                       \

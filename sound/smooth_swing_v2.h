@@ -17,16 +17,18 @@ public:
       cfx_smoothswing = true;
       if (lswing.files_found() != hswing.files_found()) {
         STDOUT.println("Warning, lswing and hswing should have the same number of files.");
-        swings_ = std::min<size_t>(lswing.files_found(), hswing.files_found());
       }
+      swings_ = std::min<size_t>(lswing.files_found(), hswing.files_found());
     } else if (swingl.files_found()) {
       STDOUT.println("Proffie Font Detected");
       cfx_smoothswing = false;
       if (swingl.files_found() != swingh.files_found()) {
         STDOUT.println("Warning, swingl and swingh should have the same number of files.");
-        swings_ = std::min<size_t>(swingl.files_found(), swingh.files_found());
       }
+      swings_ = std::min<size_t>(swingl.files_found(), swingh.files_found());
     }
+    STDOUT.print("SmoothSwing pairs: ");
+    STDOUT.println(swings_);
     // check for swngxx files to use as accent swings
     if ((swng.files_found() || swing.files_found()) > 0 && smooth_swing_config.AccentSwingSpeedThreshold > 0.0) {
       STDOUT.println("Accent Swings Enabled.");
@@ -85,7 +87,7 @@ public:
       hswing.Select(swing);
       A.Play(&lswing, start);
       B.Play(&hswing, start);
-    } else {
+    } else if (!cfx_smoothswing){
       swingl.Select(swing);
       swingh.Select(swing);
       A.Play(&swingl, start);

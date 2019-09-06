@@ -38,12 +38,13 @@ public:
           if (dynamic_mixer.get_volume() < max_volume_){
             current_volume_ += max_volume_ * 0.10;
             dynamic_mixer.set_volume(current_volume_);
-            beeper.Beep(0.5, 2000);
+            //beeper.Beep(0.5, 2000);
+			SaberBase::DoMSelect();
             STDOUT.print("Current Volume: ");
             STDOUT.println(dynamic_mixer.get_volume());
           }
           else{
-            beeper.Beep(0.5, 1000);
+            SaberBase::DoMExit();
           }
         }
 #endif
@@ -61,12 +62,12 @@ public:
             current_volume_ = dynamic_mixer.get_volume();
             current_volume_ -= (max_volume_ * 0.10) ;
             dynamic_mixer.set_volume(current_volume_);
-            beeper.Beep(0.5, 2000);
+            SaberBase::DoMSelect();
             STDOUT.print("Current Volume: ");
             STDOUT.println(dynamic_mixer.get_volume());
           }
           else{
-            beeper.Beep(0.5, 1000);
+            SaberBase::DoMExit();
           }
         }
 #endif
@@ -76,12 +77,12 @@ public:
           if (dynamic_mixer.get_volume() < max_volume_){
             current_volume_ += max_volume_ * 0.10;
             dynamic_mixer.set_volume(current_volume_);
-            beeper.Beep(0.5, 2000);
+            SaberBase::DoMSelect();
             STDOUT.print("Current Volume: ");
             STDOUT.println(dynamic_mixer.get_volume());
           }
           else{
-            beeper.Beep(0.5, 1000);
+            SaberBase::DoMExit();
           }
         }
 #endif
@@ -90,7 +91,11 @@ public:
           aux_on_ = true;
           On();
 #else
-          next_preset();
+       // DoPreset is used to reset color change to start when preset is changed
+      if (!MODE_VOLUME) {
+		SaberBase::DoPreset();
+        next_preset();
+	  }
 
 #endif
         }
@@ -103,7 +108,19 @@ public:
 #endif
 #if NUM_BUTTONS == 1
       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON | BUTTON_POWER):
-        SaberBase::DoForce();
+	    if (accel_.x < -0.15) {
+			if (!COLOR_CHANGE) {
+				SaberBase::DoScroll();
+				COLOR_CHANGE = true;
+				COLOR_SCROLL = true;
+			} else {
+				SaberBase::DoSelect();
+				COLOR_CHANGE = false;
+				COLOR_SCROLL = false;
+			}
+		} else {
+			SaberBase::DoForce();
+		}
         return true;
       case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_ON):
         StartOrStopTrack();
@@ -127,13 +144,83 @@ public:
 
 #if NUM_BUTTONS == 1
         case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_ON):
-        STDOUT.println(SaberBase::Lockup());
         if (!SaberBase::Lockup()) {
           Off();
+		  COLOR_CHANGE = false;
+		  COLOR_SCROLL = false;
         }
+		return true;
+#endif
+
+#ifdef NO_COLOR_SWING
+  #ifdef NO_LOCKUP_HOLD
+    case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_ON | BUTTON_POWER):
+      SaberBase::DoSelect();
+      COLOR_SCROLL = FALSE;
+    return true;
+    case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON | BUTTON_AUX):
+      SaberBase::DoChange();
+      return true;
+  #else
+    case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_ON | BUTTON_POWER):
+  #endif
+  SaberBase::DoChange();
+  COLOR_SCROLL = false;
+  return true;
+#else
+  case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_ON | BUTTON_POWER):
+  //SaberBase::DoChange();
+  if (!COLOR_SCROLL) {
+    if (!COLOR_CHANGE) {
+      //beeper.Beep(0.5, 2000.0);
+      COLOR_CHANGE = true;
+      SaberBase::DoMEnter();
+    } else {
+      //beeper.Beep(0.5, 2000.0);
+      COLOR_CHANGE = false;
+      SaberBase::DoMExit();
+    }
+  } else {
+    SaberBase::DoSelect();
+    COLOR_SCROLL = false;
+    COLOR_CHANGE = false;
+  }
+  return true;
+    // ColorChange
+    case EVENTID(BUTTON_NONE, EVENT_SWING, MODE_ON):
+	if (COLOR_CHANGE || COLOR_SCROLL) {
+		SaberBase::DoChange();
+	}
+	return true;
 #endif
 #if NUM_BUTTONS > 1
-      case EVENTID(BUTTON_POWER, EVENT_HELD_MEDIUM, MODE_ON):
+	// Lockup
+	// Enables Dual Lockup functionality using "Block" as second lockup effect
+	  case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_POWER):
+		SaberBase::SetLockup(SaberBase::LOCKUP_BLOCK);
+		SaberBase::DoBeginLockup();
+		return true;
+		break;
+
+     // ColorScroll
+     #ifdef NO_LOCKUP_HOLD
+       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON | BUTTON_AUX):
+     #else
+       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON | BUTTON_POWER):
+     #endif
+	//beeper.Beep(0.5, 2000.0);
+	if (!COLOR_SCROLL) {
+	  SaberBase::DoScroll();
+	  COLOR_SCROLL = true;
+	} else {
+	  SaberBase::DoSelect();
+	  COLOR_SCROLL = false;
+	  COLOR_CHANGE = false;
+	}
+	return true;
+
+     // ColorSelect
+      case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_ON):
 #endif
       case EVENTID(BUTTON_POWER, EVENT_LATCH_OFF, MODE_ON):
       case EVENTID(BUTTON_AUX, EVENT_LATCH_OFF, MODE_ON):
@@ -142,33 +229,38 @@ public:
       case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON):
 #endif
 #if NUM_BUTTONS != 1
-        Off();
+if (!SaberBase::Lockup()) {
+          Off();
+		  COLOR_CHANGE = false;
+		  COLOR_SCROLL = false;
+        }
 #endif
         return true;
 
-
-        // Lockup
-      case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_POWER):
-      case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_AUX):
-#if NUM_BUTTONS == 2
-      case EVENTID(BUTTON_AUX, EVENT_HELD, MODE_ON):
+#ifdef NO_LOCKUP_HOLD
+	  case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_AUX):
+	#else
+#if NUM_BUTTONS == 1
+	  case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_POWER):
+#else
+	  case EVENTID(BUTTON_AUX, EVENT_HELD, MODE_ON):
 #endif
-#if NUM_BUTTONS == 3
-      case EVENTID(BUTTON_AUX2, EVENT_HELD, MODE_ON):
 #endif
-        if (!SaberBase::Lockup()) {
-          if (pointing_down_) {
-            SaberBase::SetLockup(SaberBase::LOCKUP_DRAG);
-          } else {
-            SaberBase::SetLockup(SaberBase::LOCKUP_NORMAL);
-          }
-          SaberBase::DoBeginLockup();
-          return true;
-        }
+		if (!SaberBase::Lockup()) {
+		  if (pointing_down_) {
+			SaberBase::SetLockup(SaberBase::LOCKUP_DRAG);
+		  } else {
+			SaberBase::SetLockup(SaberBase::LOCKUP_NORMAL);
+		  }
+		  SaberBase::DoBeginLockup();
+	  return true;
+		}
 
         // Off functions
       case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_OFF):
 #if NUM_BUTTONS == 1
+	  if (!MODE_VOLUME);
+	    SaberBase::DoPreset();
         next_preset();
 
         return true;
@@ -182,14 +274,16 @@ public:
       current_volume_ = dynamic_mixer.get_volume();
       if (MODE_VOLUME){
         MODE_VOLUME = false;
-        beeper.Beep(0.5, 3000);
+        //beeper.Beep(0.5, 3000);
         STDOUT.println("Exit Volume Menu");
+		SaberBase::DoMExit();
 
       }
       else{
         MODE_VOLUME = true;
-        beeper.Beep(0.5, 3000);
+        //beeper.Beep(0.5, 3000);
         STDOUT.println("Enter Volume Menu");
+		SaberBase::DoMEnter();
       }
       return true;
 
@@ -198,7 +292,10 @@ public:
 	return true;
 
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_OFF | BUTTON_POWER):
-        next_preset();
+	    if (!MODE_VOLUME) {
+          SaberBase::DoPreset();
+          next_preset();
+		}
 
 	return true;
 
@@ -206,7 +303,10 @@ public:
 #if NUM_BUTTONS < 3
       case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_OFF):
 #endif
-        previous_preset();
+        if (!MODE_VOLUME) {
+		  SaberBase::DoPreset();
+          previous_preset();
+		}
 
 	return true;
       case EVENTID(BUTTON_AUX, EVENT_HELD_LONG, MODE_OFF):
@@ -239,11 +339,13 @@ public:
 
 #ifdef DUAL_POWER_BUTTONS
         if (!MODE_VOLUME) {
+        	SaberBase::DoPreset();
 			next_preset();
 
 		}
 #else
         if (!MODE_VOLUME) {
+            SaberBase::DoPreset();
 			previous_preset();
 
 		}
@@ -269,6 +371,8 @@ private:
   bool MODE_VOLUME = false;
   int32_t max_volume_ = dynamic_mixer.get_volume();
   int32_t current_volume_ = dynamic_mixer.get_volume();
+  bool COLOR_CHANGE = false;
+  bool COLOR_SCROLL = false;
 };
 
 #endif

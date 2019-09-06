@@ -190,7 +190,7 @@ public:
       }
       swing_strength_ = std::min<float>(1.0, speed / swingThreshold_);
     } else if (speed <= config_.ProffieOSSwingLowerThreshold) {
-      if (accel_.x > config_.ProffieOSStabAccelerationThreshold && accel_.y < 1.5 && accel_.z < 1.5) {
+      if (accel_.x > config_.ProffieOSStabAccelerationThreshold && fabs(accel_.y) < 1.5 && fabs(accel_.z) < 1.5) {
         if (!stabbing_) {
           if (stab.files_found()) {
             if (!guess_monophonic_) {
@@ -299,6 +299,33 @@ public:
   }
   void SB_Clash() override { Play(&clash, &clsh); }
   void SB_Stab() override { PlayCommon(&stab); }
+//  void SB_Change() override { PlayCommon(&change); }
+  void SB_MEnter() override
+  {
+	if (menter.files_found()) {
+		PlayCommon(&menter);
+	} else {
+	  beeper.Beep(0.5, 3000);
+	}
+  }
+  void SB_MExit() override
+  {
+	if (mexit.files_found()) {
+	  PlayCommon(&mexit);
+	} else {
+	  beeper.Beep(0.5, 3000);
+	}
+  }
+  void SB_MSelect() override
+  {
+	if (mselect.files_found()) {
+		PlayCommon(&mselect);
+	} else {
+		beeper.Beep(0.5, 2000);
+	}
+  }
+//  void SB_Scroll() override { PlayCommon(&select); }
+//  void SB_Select() override { PlayCommon(&change); }
   void SB_Force() override { PlayCommon(&force); }
   void SB_Blast() override { Play(&blaster, &blst); }
   void SB_Boot() override { PlayPolyphonic(&boot); }

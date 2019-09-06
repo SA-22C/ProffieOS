@@ -30,10 +30,25 @@ public:
   }
 
   void SB_Clash() override {
-    addEffect(EFFECT_CLASH, (200 + random(700)) / 1000.0f);
+    addEffect(EFFECT_CLASH, (300 + random(300)) / 1000.0f);
   }
   void SB_Stab() override {
     addEffect(EFFECT_STAB, 1.0f);
+  }
+  void SB_Change() override {
+    addEffect(EFFECT_CHANGE, 1.0f);
+    SaberBase::DoMSelect();
+  }
+  void SB_Preset() override {
+    addEffect(EFFECT_CHANGEPRESET, 1.0f);
+  }
+  void SB_Scroll() override {
+    addEffect(EFFECT_SCROLL, 1.0f);
+    SaberBase::DoMEnter();
+  }
+  void SB_Select() override {
+    addEffect(EFFECT_SELECT, 1.0f);
+    SaberBase::DoMSelect();
   }
   void SB_Blast() override {
     addEffect(EFFECT_BLAST, (200 + random(700)) / 1000.0f);
@@ -57,21 +72,22 @@ public:
   }
 
   void SB_BeginLockup() override {
-    if (SaberBase::Lockup() == LOCKUP_NORMAL) {
-      addEffect(EFFECT_LOCKUP_BEGIN, (200 + random(700)) / 1000.0f);
+    if (SaberBase::Lockup() == LOCKUP_NORMAL || SaberBase::Lockup() == LOCKUP_BLOCK) {
+      addEffect(EFFECT_LOCKUP_BEGIN, (400 + random(200)) / 1000.0f);
     }
     if (SaberBase::Lockup() == LOCKUP_DRAG) {
-      addEffect(EFFECT_DRAG_BEGIN, (200 + random(700)) / 1000.0f);
+      addEffect(EFFECT_DRAG_BEGIN, 1.0f);
     }
+
   }
 
   void SB_EndLockup() override {
     // TODO: use same location as begin
-    if (SaberBase::Lockup() == LOCKUP_NORMAL) {
-      addEffect(EFFECT_LOCKUP_END, (200 + random(700)) / 1000.0f);
+    if (SaberBase::Lockup() == LOCKUP_NORMAL || SaberBase::Lockup() == LOCKUP_BLOCK) {
+      addEffect(EFFECT_LOCKUP_END, (400 + random(200)) / 1000.0f);
     }
     if (SaberBase::Lockup() == LOCKUP_DRAG) {
-      addEffect(EFFECT_DRAG_END, (200 + random(700)) / 1000.0f);
+      addEffect(EFFECT_DRAG_END, 1.0f);
     }
   }
 

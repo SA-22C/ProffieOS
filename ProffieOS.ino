@@ -6,6 +6,7 @@
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
+ 
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
@@ -14,7 +15,7 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public Licensep
+ You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
@@ -22,7 +23,8 @@
 // to use here.
 
 
-#define CONFIG_FILE "config/proffiesaber.h"
+#define CONFIG_FILE "config/tgs_tcs.h"
+//#define CONFIG_FILE "config/new_mympp_config.h"
 //#define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
@@ -102,11 +104,8 @@
 // clipping.
 
 // TODO LIST:
-//   stab detect/effect
-//
 // Audio work items:
 //   select clash from force
-//   stab effect
 // Blade stuff
 //    better clash
 // Allow several blades to share power pins.
@@ -180,7 +179,7 @@ SnoozeTouch snooze_touch;
 SnoozeBlock snooze_config(snooze_touch, snooze_digital, snooze_timer);
 #endif
 
-const char version[] = "$Id: ce12a06a1e236b5101ec60c950530a9a4719a74d $";
+const char version[] = "2.4CC";
 
 #include "common/state_machine.h"
 #include "common/monitoring.h"
@@ -460,6 +459,7 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "styles/clash.h"
 #include "styles/lockup.h"  // Also does "drag"
 #include "styles/stab.h"
+#include "styles/flare.h"
 #include "styles/blast.h"
 #include "styles/strobe.h"
 #include "styles/inout_helper.h"
@@ -471,6 +471,9 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "styles/stripes.h"
 #include "styles/random_blink.h"
 #include "styles/sequence.h"
+#include "styles/colorchange.h"
+#include "styles/templates.h"
+#include "styles/transitions.h"
 
 // functions
 #include "functions/ifon.h"
@@ -490,6 +493,7 @@ struct is_same_type<T, T> { static const bool value = true; };
 // Use EasyBlade<COLOR, CLASH_COLOR> instead of EASYBLADE(COLOR, CLASH_COLOR)
 template<class color, class clash_color, class lockup_flicker_color = WHITE>
 using EasyBlade = SimpleClash<Lockup<Blast<color, WHITE>, AudioFlicker<color, lockup_flicker_color> >, clash_color>;
+
 
 // The following functions are mostly for illustration.
 // The templates above gives you more power and functionality.
