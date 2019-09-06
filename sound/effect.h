@@ -365,6 +365,9 @@ EFFECT(clash);
 EFFECT(force);  // also polyphonic
 EFFECT(stab);   // also polyphonic
 EFFECT(spin);
+EFFECT(menter);
+EFFECT(mexit);
+EFFECT(mselect);
 EFFECT(blaster);
 EFFECT(lockup);
 EFFECT(poweronf);

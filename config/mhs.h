@@ -13,6 +13,12 @@ const unsigned int maxLedsPerStrip = 144;
 
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
+  { "Rogue", "tracks/rey_training.wav",
+      StylePtr<InOutHelper<SimpleClash<Lockup<Blast<ColorCycle<White,  17, 50, Blue,  17, 450, 4000>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>, 300, 6000, ColorCycle<White,  17, 50, White,  17, 50, 1>>>(),
+      StylePtr<InOutHelper<SimpleClash<Lockup<Blast<OnSpark<AudioFlicker<Rgb<0,123,255>,Rgb<0,62,139>>,White,200>,Red>,AudioFlicker<OnSpark<AudioFlicker<Blue,Rgb<0,0,139>>,White,200>,White>>,White,40>,350,500,Black>>(), "Graflex8"},
+  { "Bespin", "tracks/venus.wav",
+      StylePtr<InOutHelper<SimpleClash<Lockup<Blast<ColorCycle<White,  17, 50, BrownNoiseFlicker<Green,Blue,75>,  17, 450, 4000>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>, 300, 6000, ColorCycle<White,  17, 50, White,  17, 50, 1>>>(),
+      StylePtr<InOutSparkTip<SimpleClash<Lockup<Blast<BrownNoiseFlicker<Green,Blue,75>,Red,200,100,400>,AudioFlicker<BrownNoiseFlicker<Green,Blue,75>,LemonChiffon>,AudioFlicker<BrownNoiseFlicker<Green,Blue,75>,Orange>>,LemonChiffon,40>,300,800,White>>(), "balance"},
     { "Graflex8", "tracks/rey_training.wav",
         StylePtr<InOutHelper<SimpleClash<Lockup<Blast<ColorCycle<White,  17, 50, Blue,  17, 450, 4000>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>, 300, 6000, ColorCycle<White,  17, 50, White,  17, 50, 1>>>(),
         StylePtr<InOutHelper<SimpleClash<Lockup<Blast<OnSpark<AudioFlicker<Rgb<0,123,255>,Rgb<0,62,139>>,White,200>,Red>,AudioFlicker<OnSpark<AudioFlicker<Blue,Rgb<0,0,139>>,White,200>,White>>,White,40>,350,500,Black>>(), "Graflex8"},
@@ -49,7 +55,7 @@ Preset presets[] = {
     { "RgueCmdr", "tracks/venus.wav",
         StylePtr<InOutHelper<SimpleClash<Lockup<Blast<ColorCycle<White,  17, 50,AudioFlicker<DarkOrange, Rgb<128,0,0>>,  17, 450, 4000>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>, 300, 6000, ColorCycle<White,  17, 50, White,  17, 50, 1>>>(),
         StylePtr<InOutHelper<EasyBlade<OnSpark<ColorCycle<Yellow,  0, 1, AudioFlicker<DarkOrange, Rgb<128,0,0>>,  100, 3000, 800>>, White>, 300, 800> >(), "RgueCmdr"},
-    
+
     { "LukeROTJ", "tracks/jabba.wav",
         StylePtr<InOutHelper<SimpleClash<Lockup<Blast<ColorCycle<White,  17, 50,AudioFlicker<Green,Rgb<0,139,0>>,  17, 450, 4000>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>, 300, 6000, ColorCycle<White,  17, 50, White,  17, 50, 1>>>(),
         StylePtr<InOutHelper<SimpleClash<Lockup<Blast<OnSpark<AudioFlicker<Green,Rgb<0,139,0>>,White,200>,Orange,200,100,400>,AudioFlicker<OnSpark<AudioFlicker<Green,Rgb<0,139,0>>,White,200>,White>,AudioFlicker<OnSpark<AudioFlicker<Green,Rgb<0,139,0>>,White,200>,Red>>,White,40>,200,500,Black>>(),"LukeROTJ"},
@@ -82,7 +88,7 @@ BladeConfig blades[] = {
     { 0, SubBlade(0,5, WS2811BladePtr<144, WS2811_ACTUALLY_800kHz | WS2811_GRB>()),
         SubBlade(6,130, NULL),
          CONFIGARRAY(presets) },
-    
+
 };
 #endif
 

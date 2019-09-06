@@ -39,6 +39,8 @@ public:
         aux_on_ = true;
         On();
 #else
+       // DoPreset is used to reset color change to start when preset is changed 
+	  SaberBase::DoPreset();
         next_preset();
 #endif
 	return true;
@@ -69,10 +71,31 @@ public:
         // Avoid the base and the very tip.
 	// TODO: Make blast only appear on one blade!
         SaberBase::DoBlast();
+	   return true;
+
+	// ColorChange
+	case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON | BUTTON_AUX):
+	SaberBase::DoChange();
+	return true;
+
+     // ColorScroll
+     case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON | BUTTON_AUX):
+	//beeper.Beep(0.5, 2000.0);
+	SaberBase::DoScroll();
+	return true;
+
+     // ColorSelect
+      case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_ON | BUTTON_POWER):
+	SaberBase::DoSelect();
 	return true;
 
         // Lockup
+        // Enables Dual Lockup functionality using "Block" as second lockup effect  
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_POWER):
+	  	SaberBase::SetLockup(SaberBase::LOCKUP_BLOCK);
+		SaberBase::DoBeginLockup();
+	  	return true;
+		break;
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_AUX):
         if (!SaberBase::Lockup()) {
           if (pointing_down_) {
@@ -95,17 +118,21 @@ public:
 	return true;
 
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_OFF | BUTTON_POWER):
+        SaberBase::DoPreset();
         next_preset();
 	return true;
 
       case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_OFF | BUTTON_AUX):
+        SaberBase::DoPreset();
         previous_preset();
 	return true;
 
       case EVENTID(BUTTON_AUX2, EVENT_CLICK_SHORT, MODE_OFF):
 #ifdef DUAL_POWER_BUTTONS
+        SaberBase::DoPreset();
         next_preset();
 #else
+        SaberBase::DoPreset();
         previous_preset();
 #endif
 	return true;

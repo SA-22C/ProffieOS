@@ -17,6 +17,10 @@ enum BladeEffectType {
   EFFECT_DRAG_END = 1 << 8,
   EFFECT_IGNITION = 1 << 9,
   EFFECT_RETRACTION = 1 << 10,
+  EFFECT_CHANGE = 1 << 11, // used for click to change
+  EFFECT_CHANGEPRESET = 1 << 12, // used to reset presets
+  EFFECT_SCROLL = 1 << 13, // used to begin scroll mode
+  EFFECT_SELECT = 1 << 14, // used to stop scroll mode
 };
 
 struct BladeEffect {

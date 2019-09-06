@@ -258,6 +258,7 @@ public:
     Clear();
     LOCK_SD(true);
     if (!Load(preset)) Set(preset);
+    #ifdef SAVED_PRESET
     if (preset >= 0 && preset < current_config->num_presets) {
       FileReader c;
       LSFS::Remove("savedpreset.ini");
@@ -269,6 +270,7 @@ public:
       c.write_key_value("volume", value);
       c.Close();
     }
+    #endif
     LOCK_SD(false);
   }
 };

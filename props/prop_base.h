@@ -198,7 +198,10 @@ public:
     ONCEPERBLADE(SET_BLADE_STYLE)
     chdir(current_preset_.font.get());
     if (on) On();
-    if (announce) SaberBase::DoNewFont();
+    if (announce)
+    {
+      SaberBase::DoNewFont();
+    }
   }
 
   // Go to the next Preset.
@@ -282,7 +285,11 @@ public:
 
     ONCEPERBLADE(ACTIVATE);
     //SetPreset(0, false);
+    #ifdef SAVED_PRESET
     ResumePreset();
+    #else
+    SetPreset(0, false);
+    #endif
     return;
 
    bad_blade:
@@ -477,6 +484,7 @@ public:
 
   BoxFilter<Vec3, 5> gyro_filter_;
   Vec3 filtered_gyro_;
+  bool swinging = false;
   void SB_Motion(const Vec3& gyro, bool clear) override {
     if (clear)
       for (int i = 0; i < 4; i++)
@@ -499,6 +507,14 @@ public:
     } else {
       DoGesture(NO_STROKE);
     }
+	if (sqrtf(gyro.z * gyro.z + gyro.y * gyro.y) > 250 && !swinging) {
+		STDOUT.println("SWING");
+          // We have a twisting gesture.
+         Event(BUTTON_NONE, EVENT_SWING);
+		 swinging = true;
+	} else if (sqrtf(gyro.z * gyro.z + gyro.y * gyro.y) < 150) {
+		swinging = false;
+	}
   }
 
   Vec3 accel_;
@@ -625,6 +641,21 @@ public:
     }
     if (!strcmp(cmd, "force")) {
       SaberBase::DoForce();
+      return true;
+    }
+    if (!strcmp(cmd, "change")) {
+      SaberBase::DoChange();
+	  SaberBase::DoMSelect();
+      return true;
+    }
+    if (!strcmp(cmd, "scroll")) {
+      SaberBase::DoScroll();
+	  SaberBase::DoMEnter();
+      return true;
+    }
+    if (!strcmp(cmd, "select")) {
+      SaberBase::DoSelect();
+	  SaberBase::DoMSelect();
       return true;
     }
     if (!strcmp(cmd, "blast")) {
@@ -942,6 +973,9 @@ public:
     STDOUT.println(" on/off - turn saber on/off");
     STDOUT.println(" force - trigger a force push");
     STDOUT.println(" blast - trigger a blast");
+    STDOUT.println(" change - trigger a change");
+    STDOUT.println(" scroll - trigger scroll/demo feature");
+    STDOUT.println(" select - stop / select from scroll");
     STDOUT.println(" lock - begin/end lockup");
 #ifdef ENABLE_AUDIO
     STDOUT.println(" pwd - print current directory");
