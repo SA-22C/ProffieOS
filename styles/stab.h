@@ -29,7 +29,7 @@ public:
       stab_cutoff_ = 0;
     }
     mult_ - NELEM(stab_hump) * 2 * 102400 /50/blade->num_leds();
-    lockup_location_ = 1 * blade->num_leds() * mult_;
+    lockup_location_ = blade->num_leds() * mult_;
     stab_color_.run(blade);
     // This should make us activate the stab at least one "frame".
     stab_ |= !!effect_.Detect(blade);
@@ -39,15 +39,13 @@ public:
   OverDriveColor getColor(int led) {
     OverDriveColor ret = base_.getColor(led);
     OverDriveColor stab = stab_color_.getColor(led);
-    dist_ = abs(led * mult_ - lockup_location_)/1024;
+    dist_ = (led * mult_ - lockup_location_)/1024;
     if (stab_ && led >= stab_cutoff_) {
       if (dist_ < NELEM(stab_hump)) {
         ret.c = ret.c.mix(stab.c, stab_hump[dist_]);
-        return ret;
       }
-    } else {
-      return base_.getColor(led);
     }
+    return ret;
   }
 private:
   OneshotEffectDetector<EFFECT> effect_;

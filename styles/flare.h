@@ -32,15 +32,13 @@ public:
   OverDriveColor getColor(int led) {
     OverDriveColor ret = base_.getColor(led);
     OverDriveColor flare =  flare_color_.getColor(led);
-    dist_ = abs(led * mult_ - 0)/1024;
+    dist_ = led * mult_/1024;
     if (led <= flare_cutoff_) {
       if (dist_ < NELEM(flare_hump)) {
-        ret.c = ret.c.mix(flare.c, stab_hump[dist_]);
-        return ret;
+        ret.c = ret.c.mix(flare.c, flare_hump[dist_]);
       }
-    } else {
-      return base_.getColor(led);
     }
+    return ret;
   }
 private:
   int flare_cutoff_;
