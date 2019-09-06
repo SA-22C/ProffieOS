@@ -2,7 +2,7 @@
 #include "proffieboard_config.h"
 #define NUM_BLADES 1
 #define NUM_BUTTONS 2
-#define VOLUME 1500
+#define VOLUME 1200
 const unsigned int maxLedsPerStrip = 144;
 #define CLASH_THRESHOLD_G 3.1
 #define ENABLE_AUDIO
@@ -25,7 +25,7 @@ const unsigned int maxLedsPerStrip = 144;
 
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
-  { "Teensy", "tracks/march.wav",
+  { "TeensySF", "tracks/march.wav",
   StylePtr<InOutHelper<CCAudio<SET1MAIN,SET1FLICKER,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST>,180,500>>(),
   },
   { "SmthJedi", "tracks/march.wav",
