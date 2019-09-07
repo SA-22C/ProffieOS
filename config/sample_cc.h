@@ -2,7 +2,7 @@
 #include "proffieboard_config.h"
 #define NUM_BLADES 1
 #define NUM_BUTTONS 2
-#define VOLUME 200
+#define VOLUME 1200
 const unsigned int maxLedsPerStrip = 144;
 #define CLASH_THRESHOLD_G 3.1
 #define ENABLE_AUDIO
@@ -34,7 +34,7 @@ Preset presets[] = {
   { "SmthGrey", "tracks/uranus.wav",
   StylePtr<InOutHelper<CCUnstable<SET1MAIN,SET1A,SET1B,SET1C,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST>,180,500>>(),
   },
-  { "OUTCAST", "tracks/venus.wav",
+  { "SmthJedi", "tracks/venus.wav",
   StylePtr<InOutHelper<CCUnstableFlare<SET1MAIN,SET1FLICKER,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST,SET1FLARE>,180,500>>(),
   },
   { "RgueCmdr", "tracks/mercury.wav",

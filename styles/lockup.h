@@ -74,7 +74,8 @@ static uint8_t block_hump[32] = {
 template<class BASE, class LOCALIZED_LOCKUP, class DRAG_COLOR = LOCALIZED_LOCKUP,
          class BLOCK_COLOR = LOCALIZED_LOCKUP, int LOCKUP_WALK_MILLIS = 200,
 		 int LOCKUP_WIDTH_PERCENT = 50, int BLOCK_WALK_MILLIS = 50,
-     int BLOCK_WIDTH_PERCENT = 20, BladeEffectType EFFECT = EFFECT_LOCKUP_BEGIN>
+     int BLOCK_WIDTH_PERCENT = 20, int DRAG_WIDTH_PERCENT = 50,
+     BladeEffectType EFFECT = EFFECT_LOCKUP_BEGIN>
 class LocalizedLockup {
 public:
   void run(BladeBase* blade) {
@@ -84,12 +85,7 @@ public:
     if (!is_same_type<DRAG_COLOR, LOCALIZED_LOCKUP>::value)
       drag_.run(blade);
     total_leds_ = blade->num_leds();
-    if (total_leds_ > 6) {
-      drag_cutoff_ = total_leds_ * 90 / 100;
-      //drag_cutoff_ = 0;
-    } else {
-      drag_cutoff_ = 0;
-    }
+    drag_cutoff_ = 0;
     if (BladeEffect* e = effect_.Detect(blade)) {
       if (e->location > 0.0 && e->location < 1.0) {
         effect_location_ = e->location;
@@ -168,8 +164,10 @@ public:
 
 	case SaberBase::LOCKUP_DRAG:
   if (SaberBase::LOCKUP_DRAG) {
+    mult_ = NELEM(lockup_hump) * 2 * 102400 / DRAG_WIDTH_PERCENT / total_leds_;
     lockup_location_ = 1 * total_leds_ * mult_;
     lockup_detected_ = false;
+    dist_ = abs(led * mult_ - lockup_location_)/1024;
   }
       if (led >= drag_cutoff_) {
 	if (is_same_type<DRAG_COLOR, LOCALIZED_LOCKUP>::value) {

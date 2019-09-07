@@ -10,25 +10,20 @@
 // when a stab occurs.
 
 static uint8_t stab_hump[32] = {
-  255,255,255,255,255,255,255,255,
-  255,255,255,255,255,255,255,255,
-  255,255,255,244,234,169,143,123,
-  101,81,63,47,33,21,11,3,
+  255,255,252,247,240,232,222,211,
+  199,186,173,159,145,132,119,106,
+  94,82,72,62,53,45,38,32,
+  26,22,18,14,11,9,7,5
 };
 
 template<class T, class STAB_COLOR = Rgb<255,255,255>, int STAB_MILLIS = 1000,
-  BladeEffectType EFFECT = EFFECT_STAB>
+  int STAB_WIDTH=50, BladeEffectType EFFECT = EFFECT_STAB>
 class Stab {
 public:
   void run(BladeBase* blade) {
     base_.run(blade);
     int num_leds = blade->num_leds();
-    if (num_leds > 6) {
-      stab_cutoff_ = num_leds * 90 / 100;
-    } else {
-      stab_cutoff_ = 0;
-    }
-    mult_ - NELEM(stab_hump) * 2 * 102400 /50/blade->num_leds();
+    mult_ = NELEM(stab_hump) * 2 * 102400 /STAB_WIDTH/blade->num_leds();
     lockup_location_ = blade->num_leds() * mult_;
     stab_color_.run(blade);
     // This should make us activate the stab at least one "frame".
@@ -38,9 +33,9 @@ public:
   }
   OverDriveColor getColor(int led) {
     OverDriveColor ret = base_.getColor(led);
-    OverDriveColor stab = stab_color_.getColor(led);
-    dist_ = (led * mult_ - lockup_location_)/1024;
-    if (stab_ && led >= stab_cutoff_) {
+    if (stab_) {
+      OverDriveColor stab = stab_color_.getColor(led);
+      dist_ = abs(led * mult_ - lockup_location_)/1024;
       if (dist_ < NELEM(stab_hump)) {
         ret.c = ret.c.mix(stab.c, stab_hump[dist_]);
       }
