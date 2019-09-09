@@ -153,7 +153,7 @@ public:
       case SwingState::ON:
         // trigger accent swing
         if (accent_swings_present &&
-            (A.player.isPlaying() || B.player.isPlaying())) {
+            (A.isPlaying() || B.isPlaying())) {
           delegate_->StartSwing(gyro, smooth_swing_config.AccentSwingSpeedThreshold,
           smooth_swing_config.AccentSlashAccelerationThreshold);
         }
