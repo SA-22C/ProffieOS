@@ -143,7 +143,7 @@ public:
     itoa(effect_seq, value, 10);
     f->write_key_value("effect_seq", value);
     itoa(color_scroll_seq, value, 10);
-    f->write_key_value("color_scroll_seq", value);  
+    f->write_key_value("color_scroll_seq", value);
     f->write_key_value("name", name.get());
     return true;
   }
@@ -289,8 +289,8 @@ public:
   void SetPreset(int preset) {
     Clear();
     LOCK_SD(true);
-    if (!Load(preset)) Set(preset);
     #ifdef SAVED_PRESET
+    if (!Load(preset)) Set(preset);
     if (preset >= 0 && preset < current_config->num_presets) {
       FileReader c;
       LSFS::Remove("savedpreset.ini");
@@ -300,9 +300,10 @@ public:
       c.write_key_value("preset", value);
       itoa(dynamic_mixer.get_volume(), value, 10);
       c.write_key_value("volume", value);
-      
       c.Close();
     }
+    #else
+    Set(preset);
     #endif
     LOCK_SD(false);
   }

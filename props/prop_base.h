@@ -181,7 +181,7 @@ public:
       if (current_preset_.name.get()) {
         SaberBase::DoMessage(current_preset_.name.get());
       } else {
-      
+
         char message[64];
         strcpy(message, "Preset: ");
         itoa(current_preset_.preset_num + 1,
@@ -210,7 +210,9 @@ public:
 #ifdef ENABLE_AUDIO
     beeper.Beep(0.05, 2000.0);
 #endif
+    #ifdef SAVED_PRESET
     current_preset_.SaveAt(current_preset_.preset_num);
+    #endif
     SetPreset(current_preset_.preset_num + 1, true);
   }
 
@@ -219,7 +221,9 @@ public:
 #ifdef ENABLE_AUDIO
     beeper.Beep(0.05, 2000.0);
 #endif
+    #ifdef SAVED_PRESET
     current_preset_.SaveAt(current_preset_.preset_num);
+    #endif
     SetPreset(current_preset_.preset_num - 1, true);
   }
 
@@ -304,7 +308,7 @@ public:
   }
 
   void ResumePreset() {
-    
+
     FileReader f;
     CurrentPreset tmp;
     int newPreset;
@@ -802,7 +806,7 @@ public:
       SaberBase::DoMessage(arg);
       return true;
     }
-   
+
     if (!strcmp(cmd, "list_presets")) {
       CurrentPreset tmp;
       for (int i = 0; ; i++) {
