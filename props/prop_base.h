@@ -181,6 +181,7 @@ public:
       if (current_preset_.name.get()) {
         SaberBase::DoMessage(current_preset_.name.get());
       } else {
+      
         char message[64];
         strcpy(message, "Preset: ");
         itoa(current_preset_.preset_num + 1,
@@ -209,6 +210,7 @@ public:
 #ifdef ENABLE_AUDIO
     beeper.Beep(0.05, 2000.0);
 #endif
+    current_preset_.SaveAt(current_preset_.preset_num);
     SetPreset(current_preset_.preset_num + 1, true);
   }
 
@@ -217,6 +219,7 @@ public:
 #ifdef ENABLE_AUDIO
     beeper.Beep(0.05, 2000.0);
 #endif
+    current_preset_.SaveAt(current_preset_.preset_num);
     SetPreset(current_preset_.preset_num - 1, true);
   }
 
@@ -301,6 +304,7 @@ public:
   }
 
   void ResumePreset() {
+    
     FileReader f;
     CurrentPreset tmp;
     int newPreset;
@@ -325,7 +329,9 @@ public:
       f.Close();
       LOCK_SD(false);
       SetPreset(newPreset, false);
-      dynamic_mixer.set_volume(newVolume);
+      if (newVolume < VOLUME) {
+        dynamic_mixer.set_volume(newVolume);
+      }
     } else {
       LOCK_SD(false);
       SetPreset(0, false);
@@ -796,10 +802,7 @@ public:
       SaberBase::DoMessage(arg);
       return true;
     }
-    if (!strcmp(cmd, "savepreset")) {
-      current_preset_.SavePresetINI();
-    }
-
+   
     if (!strcmp(cmd, "list_presets")) {
       CurrentPreset tmp;
       for (int i = 0; ; i++) {
@@ -1016,23 +1019,21 @@ public:
   virtual bool Event2(enum BUTTON button, EVENT event, uint32_t modifiers) = 0;
 
   void SB_SetColor(int n_) override{
-    STDOUT.print("COLOR SEQUENCE NUMBER: ");
-    STDOUT.println(n_);
     current_preset_.color_seq = n_;
   }
   void SB_SetEffect(int n_) override{
-    STDOUT.print("EFFECT SEQUENCE NUMBER: ");
-    STDOUT.println(n_);
-    current_preset_.effect_seq = n_;
+     current_preset_.effect_seq = n_;
+  }
+  void SB_SetColorScroll(int n_) override{
+     current_preset_.color_scroll_seq = n_;
   }
   int SB_INTGetColor() override{
-    STDOUT.print("SETTING COLOR SEQUENCE TO: ");
-    STDOUT.println(current_preset_.color_seq);
     return current_preset_.color_seq;
   }
   int SB_INTGetEffect() override{
-    STDOUT.print("SETTING EFFECT SEQUENCE TO: ");
-    STDOUT.println(current_preset_.effect_seq);
+    return current_preset_.effect_seq;
+  }
+  int SB_INTGetColorScroll() override{
     return current_preset_.effect_seq;
   }
 

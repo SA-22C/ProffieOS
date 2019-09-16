@@ -14,7 +14,7 @@ public:
   SaberBase::DoSetColor(n_);
    }
     if (change_.Detect(blade)) {
-	n_ = 0;
+	n_ = SaberBase::DoINTGetColor();
    }
   }
   OverDriveColor getColor(int led) {
@@ -40,12 +40,12 @@ public:
 	start_ = 0;
    }
     if (change_.Detect(blade)) {
-	n_ = 0;
+	n_ = SaberBase::DoINTGetColorScroll();
 	start_ = 0;
    }
     if (select_.Detect(blade)) {
 	n_ = n_;
-  SaberBase::DoSetColor(n_);
+  SaberBase::DoSetColorScroll(n_);
      start_ = 0;
    }
     if (scroll_.Detect(blade)) {
@@ -73,7 +73,7 @@ private:
   OneshotEffectDetector<EFFECT_SCROLL> scroll_;
   OneshotEffectDetector<EFFECT_SELECT> select_;
   uint32_t last_micros_;
-  int n_ = SaberBase::DoINTGetColor();
+  int n_ = SaberBase::DoINTGetColorScroll();
   int start_;
   MixHelper<COLORS...> colors_;
 };
@@ -86,7 +86,7 @@ public:
   void run(BladeBase* blade) {
     colors_.run(blade);
     if (change_.Detect(blade)) {
-	n_ = 0;
+	n_ = SaberBase::DoINTGetEffect();
 	start_ = 0;
    }
     if (select_.Detect(blade)) {
