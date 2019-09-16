@@ -2,9 +2,9 @@
 #include "v3_config.h"
 #define NUM_BLADES 3
 #define NUM_BUTTONS 2
-#define VOLUME 180
+#define VOLUME 1800
 const unsigned int maxLedsPerStrip = 144;
-#define CLASH_THRESHOLD_G 1.0
+#define CLASH_THRESHOLD_G 3.0
 #define ENABLE_AUDIO
 #define ENABLE_MOTION
 #define ENABLE_WS2811
@@ -95,4 +95,3 @@ BladeConfig blades[] = {
 Button PowerButton(BUTTON_POWER, aux2Pin, "pow");
 Button AuxButton(BUTTON_AUX, auxPin, "aux");
 #endif
-

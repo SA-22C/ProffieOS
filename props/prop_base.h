@@ -796,6 +796,9 @@ public:
       SaberBase::DoMessage(arg);
       return true;
     }
+    if (!strcmp(cmd, "savepreset")) {
+      current_preset_.SavePresetINI();
+    }
 
     if (!strcmp(cmd, "list_presets")) {
       CurrentPreset tmp;
@@ -1011,6 +1014,27 @@ public:
   }
 
   virtual bool Event2(enum BUTTON button, EVENT event, uint32_t modifiers) = 0;
+
+  void SB_SetColor(int n_) override{
+    STDOUT.print("COLOR SEQUENCE NUMBER: ");
+    STDOUT.println(n_);
+    current_preset_.color_seq = n_;
+  }
+  void SB_SetEffect(int n_) override{
+    STDOUT.print("EFFECT SEQUENCE NUMBER: ");
+    STDOUT.println(n_);
+    current_preset_.effect_seq = n_;
+  }
+  int SB_INTGetColor() override{
+    STDOUT.print("SETTING COLOR SEQUENCE TO: ");
+    STDOUT.println(current_preset_.color_seq);
+    return current_preset_.color_seq;
+  }
+  int SB_INTGetEffect() override{
+    STDOUT.print("SETTING EFFECT SEQUENCE TO: ");
+    STDOUT.println(current_preset_.effect_seq);
+    return current_preset_.effect_seq;
+  }
 
 protected:
   CurrentPreset current_preset_;

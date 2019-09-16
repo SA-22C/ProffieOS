@@ -9,6 +9,9 @@ class CurrentPreset {
 public:
   enum { PRESET_DISK, PRESET_ROM } preset_type;
   int preset_num;
+  int color_seq;
+  int effect_seq;
+  int current_volume;
   LSPtr<char> font;
   LSPtr<char> track;
 #define DEFINE_CURRENT_STYLE_STRING(N) LSPtr<char> current_style##N;
@@ -42,6 +45,9 @@ public:
     Preset* preset = current_config->presets + num;
     preset_type = PRESET_ROM;
     preset_num = num;
+    color_seq = 0;
+    effect_seq = 0;
+    current_volume = dynamic_mixer.get_volume();
     font = preset->font;
     track = preset->track;
 #define MAKE_STYLE_STRING(N) current_style##N = mk_builtin_str(num, N);
@@ -105,6 +111,17 @@ public:
 	ONCEPERBLADE(SET_PRESET_STYLE);
 	if (tmp) free(tmp);
       }
+      if (!strcmp(variable, "color_seq")) {
+        color_seq = f->readIntValue();
+      }
+      if (!strcmp(variable, "effect_seq")) {
+        effect_seq = f->readIntValue();
+      }
+      if (!strcmp(variable, "current_volume")) {
+        if (f->readIntValue() < VOLUME) {
+          dynamic_mixer.set_volume(f->readIntValue());
+        }
+      }
     }
     if (preset_count == 1) {
       preset_num++;
@@ -119,6 +136,13 @@ public:
     f->write_key_value("track", track.get());
 #define WRITE_PRESET_STYLE(N) f->write_key_value("style", current_style##N.get());
     ONCEPERBLADE(WRITE_PRESET_STYLE);
+    char value[2];
+    itoa(color_seq, value, 10);
+    f->write_key_value("color_seq", value);
+    itoa(effect_seq, value, 10);
+    f->write_key_value("effect_seq", value);
+    itoa(current_volume, value, 10);
+    f->write_key_value("current_volume", value);
     f->write_key_value("name", name.get());
     return true;
   }
@@ -128,6 +152,13 @@ public:
     PrintQuotedValue("TRACK", track.get());
 #define PRINT_PRESET_STYLE(N) PrintQuotedValue("STYLE" #N, current_style##N.get());
     ONCEPERBLADE(PRINT_PRESET_STYLE);
+    char value[2];
+    itoa(color_seq, value, 10);
+    PrintQuotedValue("COLOR_SEQ", value);
+    itoa(effect_seq, value, 10);
+    PrintQuotedValue("EFFECT_SEQ", value);
+    itoa(current_volume, value, 10);
+    PrintQuotedValue("CURRENT_VOLUME", value);
     PrintQuotedValue("NAME", name.get());
   }
 
@@ -186,6 +217,28 @@ public:
     }
     f.Write("end\n");
     f.Close();
+    return true;
+  }
+
+  bool SavePresetINI() {
+    FileReader f;
+    LSFS::Remove("presets.ini");
+    LSFS::Remove("presets.tmp");
+    f.Create("presets.ini");
+    CurrentPreset tmp;
+    for (size_t i = preset_num; i < current_config->num_presets; i++) {
+      tmp.Set(i);
+      STDOUT.println(tmp.preset_num);
+      tmp.Write(&f);
+    }
+    for (size_t i = 0; i < preset_num; i++) {
+      tmp.Set(i);
+      STDOUT.println(tmp.preset_num);
+      tmp.Write(&f);
+    }
+    f.Write("end\n");
+    f.Close();
+    preset_num = 0;
     return true;
   }
 
@@ -273,6 +326,8 @@ public:
     #endif
     LOCK_SD(false);
   }
+
+
 };
 
 #endif
