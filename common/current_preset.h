@@ -286,6 +286,12 @@ public:
 
   void Save() { SaveAt(preset_num); }
 
+  void ClearPresets() {
+    LSFS::Remove("presets.ini");
+    LSFS::Remove("presets.tmp");
+    LSFS::Remove("savedpreset.ini");
+  }
+
   void SetPreset(int preset) {
     Clear();
     LOCK_SD(true);

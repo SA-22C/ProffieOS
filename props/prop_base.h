@@ -1040,6 +1040,10 @@ public:
   int SB_INTGetColorScroll() override{
     return current_preset_.effect_seq;
   }
+  void SB_ClearPresets() override {
+    current_preset_.ClearPresets();
+    SetPreset(0, true);
+  }
 
 protected:
   CurrentPreset current_preset_;
