@@ -204,7 +204,8 @@ public:
       clear_ = false;
     }
     return true;
-    
+
+
 	// Lockup
 	// Enables Dual Lockup functionality using "Block" as second lockup effect
 	  case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_POWER):
@@ -311,6 +312,11 @@ if (!SaberBase::Lockup()) {
 	return true;
 
       case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_OFF | BUTTON_AUX):
+      if (clear_) {
+        SaberBase::DoMExit();
+        clear_ = false;
+        return true;
+      }
 #if NUM_BUTTONS < 3
       case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_OFF):
 #endif

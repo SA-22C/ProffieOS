@@ -26,10 +26,6 @@ const unsigned int maxLedsPerStrip = 144;
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
   { "OUTCAST", "tracks/mars.wav",
-  StylePtr<InOutHelper<Stab<LocalizedLockup<Blast<LocalizedClash<Flare<Black,Cyan,10>,White>,White>,White,White,White,200,40,60,10>,White,500,10>,180,300>>(),
-  StylePtr<InOutHelper<Stab<LocalizedLockup<Blast<LocalizedClash<Flare<Black,Cyan,10>,White>,White>,White,White,White,200,40,60,10>,White,500,10>,180,300>>(),
-  },
-  { "OUTCAST", "tracks/mars.wav",
   StylePtr<InOutHelper<CCAudio<SET1MAIN,SET1FLICKER,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST>,180,500>>(),
   StylePtr<InOutHelper<CCAudio<SET1MAIN,SET1FLICKER,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST>,180,500>>(),
   },
