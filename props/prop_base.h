@@ -181,6 +181,7 @@ public:
       if (current_preset_.name.get()) {
         SaberBase::DoMessage(current_preset_.name.get());
       } else {
+
         char message[64];
         strcpy(message, "Preset: ");
         itoa(current_preset_.preset_num + 1,
@@ -209,6 +210,9 @@ public:
 #ifdef ENABLE_AUDIO
     beeper.Beep(0.05, 2000.0);
 #endif
+    #ifdef SAVED_PRESET
+    current_preset_.SaveAt(current_preset_.preset_num);
+    #endif
     SetPreset(current_preset_.preset_num + 1, true);
   }
 
@@ -217,6 +221,9 @@ public:
 #ifdef ENABLE_AUDIO
     beeper.Beep(0.05, 2000.0);
 #endif
+    #ifdef SAVED_PRESET
+    current_preset_.SaveAt(current_preset_.preset_num);
+    #endif
     SetPreset(current_preset_.preset_num - 1, true);
   }
 
@@ -301,6 +308,7 @@ public:
   }
 
   void ResumePreset() {
+
     FileReader f;
     CurrentPreset tmp;
     int newPreset;
@@ -325,7 +333,9 @@ public:
       f.Close();
       LOCK_SD(false);
       SetPreset(newPreset, false);
-      dynamic_mixer.set_volume(newVolume);
+      if (newVolume < VOLUME) {
+        dynamic_mixer.set_volume(newVolume);
+      }
     } else {
       LOCK_SD(false);
       SetPreset(0, false);
@@ -1011,6 +1021,29 @@ public:
   }
 
   virtual bool Event2(enum BUTTON button, EVENT event, uint32_t modifiers) = 0;
+
+  void SB_SetColor(int n_) override{
+    current_preset_.color_seq = n_;
+  }
+  void SB_SetEffect(int n_) override{
+     current_preset_.effect_seq = n_;
+  }
+  void SB_SetColorScroll(int n_) override{
+     current_preset_.color_scroll_seq = n_;
+  }
+  int SB_INTGetColor() override{
+    return current_preset_.color_seq;
+  }
+  int SB_INTGetEffect() override{
+    return current_preset_.effect_seq;
+  }
+  int SB_INTGetColorScroll() override{
+    return current_preset_.effect_seq;
+  }
+  void SB_ClearPresets() override {
+    current_preset_.ClearPresets();
+    SetPreset(0, true);
+  }
 
 protected:
   CurrentPreset current_preset_;

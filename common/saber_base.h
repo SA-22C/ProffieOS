@@ -67,7 +67,7 @@ public:
     LOCKUP_NORMAL,
     LOCKUP_DRAG,
     LOCKUP_ARMED,   // For detonators and such
-    LOCKUP_BLOCK,	// Fett263 addition for dual lockup    
+    LOCKUP_BLOCK,	// Fett263 addition for dual lockup
   };
   static LockupType Lockup() { return lockup_; }
   static void SetLockup(LockupType lockup) { lockup_ = lockup; }
@@ -96,6 +96,10 @@ public:                                                         \
   SABERFUN(Clash, (), ());                       \
   SABERFUN(Stab, (), ());                        \
   SABERFUN(Change, (), ());                      \
+  SABERFUN(SetColor, (int n_),(n_));                     \
+  SABERFUN(SetEffect, (int n_),(n_));                     \
+  SABERFUN(SetColorScroll, (int n_),(n_));                     \
+  SABERFUN(ClearPresets,(),());         \
   SABERFUN(MEnter, (), ());						 \
   SABERFUN(MExit, (), ());						 \
   SABERFUN(Preset, (), ());                      \
@@ -118,6 +122,26 @@ public:                                                         \
 
   SABERBASEFUNCTIONS();
 #undef SABERFUN
+
+#define SABERFUNINT(NAME, TYPED_ARGS, ARGS)                        \
+public:                                                         \
+  static int DoINT##NAME TYPED_ARGS {                             \
+    CHECK_LL(SaberBase, saberbases, next_saber_);               \
+    for (SaberBase *p = saberbases; p; p = p->next_saber_) {    \
+      p->SB_INT##NAME ARGS;                                        \
+    }                                                           \
+    CHECK_LL(SaberBase, saberbases, next_saber_);               \
+  }                                                             \
+                                                                \
+  virtual int SB_INT##NAME TYPED_ARGS {}
+
+#define SABERBASEINTFUNCTIONS()                     \
+  SABERFUNINT(GetColor, (),());                     \
+  SABERFUNINT(GetColorScroll, (),());                     \
+  SABERFUNINT(GetEffect, (),());
+
+  SABERBASEINTFUNCTIONS();
+#undef SABERFUNINT
 
   /* Swing rotation speed degrees per second */
   static void DoMotion(Vec3 gyro, bool clear) {

@@ -2,20 +2,31 @@
 #include "proffieboard_v1_config.h"
 #define NUM_BLADES 2
 #define NUM_BUTTONS 2
-#define VOLUME 2000
+#define VOLUME 100
 const unsigned int maxLedsPerStrip = 144;
 #define CLASH_THRESHOLD_G 2.1
 #define ENABLE_AUDIO
 #define ENABLE_MOTION
 #define ENABLE_WS2811
 #define ENABLE_SD
+#define SET1MAIN Red,OrangeRed,Orange,Yellow,GreenYellow,Green,Cyan,DeepSkyBlue,SteelBlue,Blue,Magenta,Pink
+#define SET1A Rgb<25,0,0>,OrangeRed,Rgb<15,15,0>,Rgb<10,15,0>,Rgb<0,25,0>,Rgb<0,15,10>,Rgb<0,0,25>,Rgb<0,0,25>,Rgb<0,0,25>,Rgb<15,0,10>,Rgb<10,0,15>,Rgb<25,0,0>
+#define SET1B Rgb<60,0,0>,Rgb<50,10,0>,Rgb<30,30,0>,Rgb<10,50,0>,Rgb<0,60,0>,Rgb<0,50,10>,Rgb<0,10,50>,Rgb<0,0,60>,Rgb<0,0,60>,Rgb<15,2,60>,Rgb<30,0,30>,Rgb<50,0,10>
+#define SET1C Rgb<80,0,0>,Rgb<60,15,0>,Rgb<40,40,0>,Rgb<15,60,0>,Rgb<0,80,0>,Rgb<0,60,15>,Rgb<0,15,60>,Rgb<0,0,80>,Rgb<0,0,80>,Rgb<25,8,80>,Rgb<40,0,40>,Rgb<80,0,15>
+#define SET1FLICKER Rgb<128,0,0>,Rgb<128,34,0>,Rgb<128,82,0>,Rgb<128,128,0>,Rgb<0,87,128>,Rgb<0,128,0>,Rgb<0,128,128>,Rgb<0,95,128>,Rgb<35,65,90>,Rgb<0,0,128>,Rgb<128,0,128>,Rgb<128,96,101>
+#define SET1LOCKUP Blue,Blue,Blue,Red,Red,Red,Red,Red,Red,Red,Cyan,Cyan
+#define SET1DRAG Blue,Blue,Blue,Red,Red,Red,Red,Red,Red,Red,Cyan,Cyan
+#define SET1STAB Blue,Blue,Blue,Red,Red,Red,Red,Red,Red,Red,Cyan,Cyan
+#define SET1CLASH White,White,White,White,White,White,White,White,White,White,White,White
+#define SET1BLAST White,White,White,White,White,White,White,White,White,White,White,White
+#define SET1FLARE White,White,White,White,White,White,White,White,White,White,White,White
 #endif
 
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
   { "Rogue", "tracks/rey_training.wav",
       StylePtr<InOutHelper<SimpleClash<Lockup<Blast<ColorCycle<White,  17, 50, Blue,  17, 450, 4000>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>, 300, 6000, ColorCycle<White,  17, 50, White,  17, 50, 1>>>(),
-      StylePtr<InOutHelper<SimpleClash<Lockup<Blast<OnSpark<AudioFlicker<Rgb<0,123,255>,Rgb<0,62,139>>,White,200>,Red>,AudioFlicker<OnSpark<AudioFlicker<Blue,Rgb<0,0,139>>,White,200>,White>>,White,40>,350,500,Black>>(), "Graflex8"},
+      StylePtr<InOutHelper<CCAudio<SET1MAIN,SET1FLICKER,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST>,180,500>>(), "Graflex8"},
   { "Bespin", "tracks/venus.wav",
       StylePtr<InOutHelper<SimpleClash<Lockup<Blast<ColorCycle<White,  17, 50, BrownNoiseFlicker<Green,Blue,75>,  17, 450, 4000>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>,Strobe<Black,White,15,1>>, 300, 6000, ColorCycle<White,  17, 50, White,  17, 50, 1>>>(),
       StylePtr<InOutSparkTip<SimpleClash<Lockup<Blast<BrownNoiseFlicker<Green,Blue,75>,Red,200,100,400>,AudioFlicker<BrownNoiseFlicker<Green,Blue,75>,LemonChiffon>,AudioFlicker<BrownNoiseFlicker<Green,Blue,75>,Orange>>,LemonChiffon,40>,300,800,White>>(), "balance"},

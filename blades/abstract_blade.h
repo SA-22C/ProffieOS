@@ -32,7 +32,7 @@ public:
     handled_types_ = EFFECT_NONE;
     BladeBase::SetStyle(style);
   }
-  
+
   void addEffect(BladeEffectType type, float location) {
     for (size_t i = NELEM(effects_) - 1; i; i--) {
       effects_[i] = effects_[i-1];

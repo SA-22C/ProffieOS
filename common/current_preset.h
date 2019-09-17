@@ -9,6 +9,9 @@ class CurrentPreset {
 public:
   enum { PRESET_DISK, PRESET_ROM } preset_type;
   int preset_num;
+  int color_seq = 0;
+  int effect_seq= 0;
+  int color_scroll_seq = 0;
   LSPtr<char> font;
   LSPtr<char> track;
 #define DEFINE_CURRENT_STYLE_STRING(N) LSPtr<char> current_style##N;
@@ -35,6 +38,9 @@ public:
 #define CLEAR_STYLE_STRING(N) current_style##N = "";
     ONCEPERBLADE(CLEAR_STYLE_STRING);
     name = "";
+    color_seq = 0;
+    effect_seq = 0;
+    color_scroll_seq = 0;
   }
 
   void Set(int num) {
@@ -42,6 +48,9 @@ public:
     Preset* preset = current_config->presets + num;
     preset_type = PRESET_ROM;
     preset_num = num;
+    color_seq = 0;
+    effect_seq = 0;
+    color_scroll_seq = 0;
     font = preset->font;
     track = preset->track;
 #define MAKE_STYLE_STRING(N) current_style##N = mk_builtin_str(num, N);
@@ -105,6 +114,15 @@ public:
 	ONCEPERBLADE(SET_PRESET_STYLE);
 	if (tmp) free(tmp);
       }
+      if (!strcmp(variable, "color_seq")) {
+        color_seq = f->readIntValue();
+      }
+      if (!strcmp(variable, "effect_seq")) {
+        effect_seq = f->readIntValue();
+      }
+      if (!strcmp(variable, "color_scroll_seq")) {
+        color_scroll_seq = f->readIntValue();
+      }
     }
     if (preset_count == 1) {
       preset_num++;
@@ -119,6 +137,13 @@ public:
     f->write_key_value("track", track.get());
 #define WRITE_PRESET_STYLE(N) f->write_key_value("style", current_style##N.get());
     ONCEPERBLADE(WRITE_PRESET_STYLE);
+    char value[30];
+    itoa(color_seq, value, 10);
+    f->write_key_value("color_seq", value);
+    itoa(effect_seq, value, 10);
+    f->write_key_value("effect_seq", value);
+    itoa(color_scroll_seq, value, 10);
+    f->write_key_value("color_scroll_seq", value);
     f->write_key_value("name", name.get());
     return true;
   }
@@ -128,6 +153,13 @@ public:
     PrintQuotedValue("TRACK", track.get());
 #define PRINT_PRESET_STYLE(N) PrintQuotedValue("STYLE" #N, current_style##N.get());
     ONCEPERBLADE(PRINT_PRESET_STYLE);
+    char value[30];
+    itoa(color_seq, value, 10);
+    PrintQuotedValue("COLOR_SEQ", value);
+    itoa(effect_seq, value, 10);
+    PrintQuotedValue("EFFECT_SEQ", value);
+    itoa(color_scroll_seq, value, 10);
+    PrintQuotedValue("COLOR_SCROLL_SEQ", value);
     PrintQuotedValue("NAME", name.get());
   }
 
@@ -254,25 +286,35 @@ public:
 
   void Save() { SaveAt(preset_num); }
 
+  void ClearPresets() {
+    LSFS::Remove("presets.ini");
+    LSFS::Remove("presets.tmp");
+    LSFS::Remove("savedpreset.ini");
+  }
+
   void SetPreset(int preset) {
     Clear();
     LOCK_SD(true);
-    if (!Load(preset)) Set(preset);
     #ifdef SAVED_PRESET
+    if (!Load(preset)) Set(preset);
     if (preset >= 0 && preset < current_config->num_presets) {
       FileReader c;
       LSFS::Remove("savedpreset.ini");
       c.Create("savedpreset.ini");
-      char value[2];
+      char value[30];
       itoa(preset, value, 10);
       c.write_key_value("preset", value);
       itoa(dynamic_mixer.get_volume(), value, 10);
       c.write_key_value("volume", value);
       c.Close();
     }
+    #else
+    Set(preset);
     #endif
     LOCK_SD(false);
   }
+
+
 };
 
 #endif

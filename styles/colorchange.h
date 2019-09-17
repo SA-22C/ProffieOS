@@ -11,10 +11,10 @@ public:
     colors_.run(blade);
     if (effect_.Detect(blade)) {
 	n_ = (n_ + 1) % sizeof... (COLORS);
+  SaberBase::DoSetColor(n_);
    }
     if (change_.Detect(blade)) {
-
-	n_ = 0;
+	n_ = SaberBase::DoINTGetColor();
    }
   }
   OverDriveColor getColor(int led) {
@@ -24,7 +24,7 @@ public:
 private:
   OneshotEffectDetector<EFFECT_CHANGE> effect_;
   OneshotEffectDetector<EFFECT_CHANGEPRESET> change_;
-  int n_ = 0;
+  int n_ = SaberBase::DoINTGetColor();
   MixHelper<COLORS...> colors_;
 };
 
@@ -40,11 +40,12 @@ public:
 	start_ = 0;
    }
     if (change_.Detect(blade)) {
-	n_ = 0;
+	n_ = SaberBase::DoINTGetColorScroll();
 	start_ = 0;
    }
     if (select_.Detect(blade)) {
 	n_ = n_;
+  SaberBase::DoSetColorScroll(n_);
      start_ = 0;
    }
     if (scroll_.Detect(blade)) {
@@ -72,7 +73,7 @@ private:
   OneshotEffectDetector<EFFECT_SCROLL> scroll_;
   OneshotEffectDetector<EFFECT_SELECT> select_;
   uint32_t last_micros_;
-  int n_ = 0;
+  int n_ = SaberBase::DoINTGetColorScroll();
   int start_;
   MixHelper<COLORS...> colors_;
 };
@@ -85,11 +86,12 @@ public:
   void run(BladeBase* blade) {
     colors_.run(blade);
     if (change_.Detect(blade)) {
-	n_ = 0;
+	n_ = SaberBase::DoINTGetEffect();
 	start_ = 0;
    }
     if (select_.Detect(blade)) {
 	n_ = n_;
+  SaberBase::DoSetEffect(n_);
      start_ = 0;
    }
     if (scroll_.Detect(blade)) {
@@ -116,7 +118,7 @@ private:
   OneshotEffectDetector<EFFECT_SCROLL> scroll_;
   OneshotEffectDetector<EFFECT_SELECT> select_;
   uint32_t last_micros_;
-  int n_ = 0;
+  int n_ = SaberBase::DoINTGetEffect();
   int start_;
   MixHelper<COLORS...> colors_;
 };
@@ -139,6 +141,7 @@ public:
       on_millis_ = m;
 	 c_ = n_;
       n_ = (n_ + 1) % sizeof... (COLORS);
+      SaberBase::DoSetColor(n_);
       start_ = 1;
     }
     if (change_.Detect(blade)) {
@@ -171,7 +174,7 @@ private:
   OneshotEffectDetector<EFFECT_CHANGEPRESET> change_;
   uint32_t on_millis_;
   int mix_;
-  int n_ = 0;
+  int n_ = SaberBase::DoINTGetColor();
   int c_;
   int start_;
   MixHelper<COLORS...> colors_;

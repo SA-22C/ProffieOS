@@ -194,6 +194,18 @@ public:
 	return true;
 #endif
 #if NUM_BUTTONS > 1
+    case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_OFF | BUTTON_POWER):
+    if (!clear_) {
+      clear_ = true;
+      SaberBase::DoMEnter();
+    } else if (clear_) {
+      SaberBase::DoMSelect();
+      SaberBase::DoClearPresets();
+      clear_ = false;
+    }
+    return true;
+
+
 	// Lockup
 	// Enables Dual Lockup functionality using "Block" as second lockup effect
 	  case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_POWER):
@@ -300,6 +312,11 @@ if (!SaberBase::Lockup()) {
 	return true;
 
       case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_OFF | BUTTON_AUX):
+      if (clear_) {
+        SaberBase::DoMExit();
+        clear_ = false;
+        return true;
+      }
 #if NUM_BUTTONS < 3
       case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_OFF):
 #endif
@@ -373,6 +390,7 @@ private:
   int32_t current_volume_ = dynamic_mixer.get_volume();
   bool COLOR_CHANGE = false;
   bool COLOR_SCROLL = false;
+  bool clear_ = false;
 };
 
 #endif

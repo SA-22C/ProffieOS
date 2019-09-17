@@ -152,8 +152,8 @@ public:
 
     switch (screen_) {
       case SCREEN_STARTUP:
-        DrawText("==SabeR===", 0,15, Starjedi10pt7bGlyphs);
-        DrawText("++Teensy++",-4,31, Starjedi10pt7bGlyphs);
+        DrawText("===SA-22C===", 0,15, Starjedi10pt7bGlyphs);
+        DrawText("++Proffie++",-4,31, Starjedi10pt7bGlyphs);
         break;
 
       case SCREEN_PLI:
@@ -190,10 +190,10 @@ public:
     Send(DISPLAYOFF);                    // 0xAE
     Send(SETDISPLAYCLOCKDIV);            // 0xD5
     Send(0x80);                                  // the suggested ratio 0x80
-    
+
     Send(SETMULTIPLEX);                  // 0xA8
     Send(HEIGHT - 1);
-    
+
     Send(SETDISPLAYOFFSET);              // 0xD3
     Send(0x0);                                   // no offset
     Send(SETSTARTLINE | 0x0);            // line #0
@@ -215,7 +215,7 @@ public:
     Send(0x40);
     Send(DISPLAYALLON_RESUME);           // 0xA4
     Send(NORMALDISPLAY);                 // 0xA6
-    
+
     Send(DEACTIVATE_SCROLL);
 
     Send(DISPLAYON);                     //--turn on oled panel
@@ -223,7 +223,7 @@ public:
     STDOUT.println("Display initialized.");
     screen_ = SCREEN_STARTUP;
     displayed_when_ = millis();
-    
+
     while (true) {
       FillFrameBuffer();
       Send(COLUMNADDR);
@@ -247,7 +247,7 @@ public:
       }
 
       //STDOUT.println(TWSR & 0x3, DEC);
-        
+
       // I2C
       for (i=0; i < WIDTH * HEIGHT / 8; ) {
         // send a bunch of data in one xmission
@@ -262,7 +262,7 @@ public:
       }
       loop_counter_.Update();
     }
-    
+
     STATE_MACHINE_END();
   }
 
