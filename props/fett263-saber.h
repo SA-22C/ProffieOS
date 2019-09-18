@@ -92,6 +92,19 @@ public:
   SaberBase::DoMExit();
 	return true;
 
+#if NUM_BUTTONS > 1
+    case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_OFF | BUTTON_POWER):
+    if (!clear_) {
+      clear_ = true;
+      SaberBase::DoMEnter();
+    } else if (clear_) {
+      SaberBase::DoMSelect();
+      SaberBase::DoClearPresets();
+      clear_ = false;
+    }
+    return true;
+#endif
+
         // Lockup
 		// Enables Dual Lockup functionality using "Block" as second lockup effect
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_ON | BUTTON_POWER):
@@ -127,8 +140,13 @@ public:
 	return true;
 
       case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_OFF | BUTTON_AUX):
+      if (clear_) {
+        clear_ = false;
+        SaberBase::DoMExit();
+      } else {
         SaberBase::DoPreset();
         previous_preset();
+      }
 	return true;
 
       case EVENTID(BUTTON_AUX2, EVENT_CLICK_SHORT, MODE_OFF):
@@ -156,6 +174,7 @@ public:
 private:
   bool aux_on_ = true;
   bool pointing_down_ = false;
+  bool clear_ = false;
 };
 
 #endif

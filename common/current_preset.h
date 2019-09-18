@@ -297,7 +297,7 @@ public:
     LOCK_SD(true);
     #ifdef SAVED_PRESET
     if (!Load(preset)) Set(preset);
-    if (preset >= 0 && preset < current_config->num_presets) {
+    if (preset >= 0 && preset <= current_config->num_presets) {
       FileReader c;
       LSFS::Remove("savedpreset.ini");
       c.Create("savedpreset.ini");
