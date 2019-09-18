@@ -12,6 +12,7 @@ public:
   int color_seq = 0;
   int effect_seq= 0;
   int color_scroll_seq = 0;
+  int color_fade_seq = 0;
   LSPtr<char> font;
   LSPtr<char> track;
 #define DEFINE_CURRENT_STYLE_STRING(N) LSPtr<char> current_style##N;
@@ -38,9 +39,10 @@ public:
 #define CLEAR_STYLE_STRING(N) current_style##N = "";
     ONCEPERBLADE(CLEAR_STYLE_STRING);
     name = "";
-    color_seq = 0;
-    effect_seq = 0;
-    color_scroll_seq = 0;
+    color_seq = -1;
+    effect_seq = -1;
+    color_scroll_seq = -1;
+    color_fade_seq = -1;
   }
 
   void Set(int num) {
@@ -51,6 +53,7 @@ public:
     color_seq = 0;
     effect_seq = 0;
     color_scroll_seq = 0;
+    color_fade_seq = 0;
     font = preset->font;
     track = preset->track;
 #define MAKE_STYLE_STRING(N) current_style##N = mk_builtin_str(num, N);
@@ -97,15 +100,45 @@ public:
 
       if (!strcmp(variable, "name")) {
 	name = f->readString();
+  STDOUT.print("reading name from presets.ini: ");
+  STDOUT.println(name.get());
 	continue;
       }
       if (!strcmp(variable, "font")) {
 	font = f->readString();
+  STDOUT.print("reading font from presets.ini: ");
+  STDOUT.println(font.get());
 	continue;
       }
       if (!strcmp(variable, "track")) {
 	track = f->readString();
+  STDOUT.print("reading track from presets.ini: ");
+  STDOUT.println(track.get());
 	continue;
+      }
+      if (!strcmp(variable, "color_seq")) {
+        STDOUT.print("reading color from presets.ini: ");
+        color_seq = f->readIntValue();
+        STDOUT.println(color_seq);
+        continue;
+      }
+      if (!strcmp(variable, "effect_seq")) {
+        STDOUT.print("reading effect scroll from presets.ini: ");
+        effect_seq = f->readIntValue();
+        STDOUT.println(effect_seq);
+        continue;
+      }
+      if (!strcmp(variable, "color_scroll_seq")) {
+        STDOUT.print("reading color scroll from presets.ini: ");
+        color_scroll_seq = f->readIntValue();
+        STDOUT.println(color_scroll_seq);
+        continue;
+      }
+      if (!strcmp(variable, "color_fade_seq")) {
+        STDOUT.print("reading color fade from presets.ini: ");
+        color_fade_seq = f->readIntValue();
+        STDOUT.println(color_fade_seq);
+        continue;
       }
       if (!strcmp(variable, "style")) {
 	current_style++;
@@ -113,15 +146,6 @@ public:
 #define SET_PRESET_STYLE(N) if (current_style == N) { current_style##N = tmp; tmp = 0; }
 	ONCEPERBLADE(SET_PRESET_STYLE);
 	if (tmp) free(tmp);
-      }
-      if (!strcmp(variable, "color_seq")) {
-        color_seq = f->readIntValue();
-      }
-      if (!strcmp(variable, "effect_seq")) {
-        effect_seq = f->readIntValue();
-      }
-      if (!strcmp(variable, "color_scroll_seq")) {
-        color_scroll_seq = f->readIntValue();
       }
     }
     if (preset_count == 1) {
@@ -133,17 +157,33 @@ public:
 
   bool Write(FileReader* f) {
     f->Write("new_preset\n");
+    STDOUT.print("Writing font to presets.ini: ");
+    STDOUT.println(font.get());
     f->write_key_value("font", font.get());
+    STDOUT.print("Writing track to presets.ini: ");
+    STDOUT.println(track.get());
     f->write_key_value("track", track.get());
-#define WRITE_PRESET_STYLE(N) f->write_key_value("style", current_style##N.get());
-    ONCEPERBLADE(WRITE_PRESET_STYLE);
     char value[30];
     itoa(color_seq, value, 10);
+    STDOUT.print("Writing color to presets.ini: ");
+    STDOUT.println(value);
     f->write_key_value("color_seq", value);
     itoa(effect_seq, value, 10);
+    STDOUT.print("Writing effect to presets.ini: ");
+    STDOUT.println(value);
     f->write_key_value("effect_seq", value);
     itoa(color_scroll_seq, value, 10);
+    STDOUT.print("Writing color scroll to presets.ini: ");
+    STDOUT.println(value);
     f->write_key_value("color_scroll_seq", value);
+    itoa(color_fade_seq, value, 10);
+    STDOUT.print("Writing color fade to presets.ini: ");
+    STDOUT.println(value);
+    f->write_key_value("color_fade_seq", value);
+#define WRITE_PRESET_STYLE(N) f->write_key_value("style", current_style##N.get());
+    ONCEPERBLADE(WRITE_PRESET_STYLE);
+    STDOUT.print("Writing name to presets.ini: ");
+    STDOUT.println(name.get());
     f->write_key_value("name", name.get());
     return true;
   }
@@ -151,8 +191,6 @@ public:
   void Print() {
     PrintQuotedValue("FONT", font.get());
     PrintQuotedValue("TRACK", track.get());
-#define PRINT_PRESET_STYLE(N) PrintQuotedValue("STYLE" #N, current_style##N.get());
-    ONCEPERBLADE(PRINT_PRESET_STYLE);
     char value[30];
     itoa(color_seq, value, 10);
     PrintQuotedValue("COLOR_SEQ", value);
@@ -160,6 +198,10 @@ public:
     PrintQuotedValue("EFFECT_SEQ", value);
     itoa(color_scroll_seq, value, 10);
     PrintQuotedValue("COLOR_SCROLL_SEQ", value);
+    itoa(color_fade_seq, value, 10);
+    PrintQuotedValue("COLOR_FADE_SEQ", value);
+#define PRINT_PRESET_STYLE(N) PrintQuotedValue("STYLE" #N, current_style##N.get());
+    ONCEPERBLADE(PRINT_PRESET_STYLE);
     PrintQuotedValue("NAME", name.get());
   }
 
@@ -280,6 +322,7 @@ public:
     out.Write("end\n");
     out.Close();
     UpdateINI();
+    SavePreset(position + 1);
     preset_num = position;
     LOCK_SD(false);
   }
@@ -287,34 +330,44 @@ public:
   void Save() { SaveAt(preset_num); }
 
   void ClearPresets() {
+    LOCK_SD(true);
     LSFS::Remove("presets.ini");
     LSFS::Remove("presets.tmp");
     LSFS::Remove("savedpreset.ini");
-  }
-
-  void SetPreset(int preset) {
-    Clear();
-    LOCK_SD(true);
-    #ifdef SAVED_PRESET
-    if (!Load(preset)) Set(preset);
-    if (preset >= 0 && preset <= current_config->num_presets) {
-      FileReader c;
-      LSFS::Remove("savedpreset.ini");
-      c.Create("savedpreset.ini");
-      char value[30];
-      itoa(preset, value, 10);
-      c.write_key_value("preset", value);
-      itoa(dynamic_mixer.get_volume(), value, 10);
-      c.write_key_value("volume", value);
-      c.Close();
-    }
-    #else
-    Set(preset);
-    #endif
     LOCK_SD(false);
   }
 
+  void SetPreset(int preset) {
+    //Clear();
+    #ifdef SAVED_PRESET
+    if (font.get() != NULL) {
+      Save();
+    }
+    Clear();
+    LOCK_SD(true);
+    if (!Load(preset)) {
+      STDOUT.println("error loading presets.ini");
+      Set(preset);
+    }
+    LOCK_SD(false);
+    #else
+    Set(preset);
+    #endif
+  }
 
+bool SavePreset(int preset) {
+  if (preset >= 0 && preset <= current_config->num_presets) {
+    FileReader c;
+    LSFS::Remove("savedpreset.ini");
+    c.Create("savedpreset.ini");
+    char value[30];
+    itoa(preset, value, 10);
+    c.write_key_value("preset", value);
+    itoa(dynamic_mixer.get_volume(), value, 10);
+    c.write_key_value("volume", value);
+    c.Close();
+  }
+}
 };
 
 #endif

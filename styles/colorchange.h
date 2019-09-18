@@ -9,12 +9,13 @@ public:
 
   void run(BladeBase* blade) {
     colors_.run(blade);
+    if (change_.Detect(blade)) {
+      STDOUT.println("CHANGE");
+	n_ = SaberBase::DoINTGetColor();
+   }
     if (effect_.Detect(blade)) {
 	n_ = (n_ + 1) % sizeof... (COLORS);
   SaberBase::DoSetColor(n_);
-   }
-    if (change_.Detect(blade)) {
-	n_ = SaberBase::DoINTGetColor();
    }
   }
   OverDriveColor getColor(int led) {
@@ -35,17 +36,18 @@ class ColorScroll {
 public:
   void run(BladeBase* blade) {
     colors_.run(blade);
-    if (effect_.Detect(blade)) {
-	n_ = (n_ + 1) % sizeof... (COLORS);
+    if (change_.Detect(blade)) {
+      STDOUT.println("CHANGE");
+	n_ = SaberBase::DoINTGetColorScroll();
 	start_ = 0;
    }
-    if (change_.Detect(blade)) {
-	n_ = SaberBase::DoINTGetColorScroll();
+    if (effect_.Detect(blade)) {
+	n_ = (n_ + 1) % sizeof... (COLORS);
+  SaberBase::DoSetColorScroll(n_);
 	start_ = 0;
    }
     if (select_.Detect(blade)) {
 	n_ = n_;
-  SaberBase::DoSetColorScroll(n_);
      start_ = 0;
    }
     if (scroll_.Detect(blade)) {
@@ -59,6 +61,7 @@ public:
 	   last_micros_ = now;
        } else {
 	   n_ = (n_ + 1) % sizeof...(COLORS);
+     SaberBase::DoSetColorScroll(n_);
 	  last_micros_ += millis_per_color * 1000;
       }
     }
@@ -86,12 +89,12 @@ public:
   void run(BladeBase* blade) {
     colors_.run(blade);
     if (change_.Detect(blade)) {
+      STDOUT.println("CHANGE");
 	n_ = SaberBase::DoINTGetEffect();
 	start_ = 0;
    }
     if (select_.Detect(blade)) {
 	n_ = n_;
-  SaberBase::DoSetEffect(n_);
      start_ = 0;
    }
     if (scroll_.Detect(blade)) {
@@ -105,6 +108,7 @@ public:
 	   last_micros_ = now;
        } else {
 	   n_ = (n_ + 1) % sizeof...(COLORS);
+     SaberBase::DoSetEffect(n_);
 	  last_micros_ += millis_per_color * 1000;
       }
     }
@@ -137,17 +141,18 @@ public:
   void run(BladeBase* blade) {
     colors_.run(blade);
     uint32_t m = millis();
+    if (change_.Detect(blade)) {
+      STDOUT.println("CHANGE");
+	n_ = SaberBase::DoINTGetColorFade();
+     c_ = 0;
+     start_ = 0;
+    }
     if (effect_.Detect(blade)) {
       on_millis_ = m;
 	 c_ = n_;
       n_ = (n_ + 1) % sizeof... (COLORS);
-      SaberBase::DoSetColor(n_);
+      SaberBase::DoSetColorFade(n_);
       start_ = 1;
-    }
-    if (change_.Detect(blade)) {
-	n_ = 0;
-     c_ = 0;
-     start_ = 0;
     }
     if (start_ == 1) {
     uint32_t t = millis() - on_millis_;
@@ -174,7 +179,7 @@ private:
   OneshotEffectDetector<EFFECT_CHANGEPRESET> change_;
   uint32_t on_millis_;
   int mix_;
-  int n_ = SaberBase::DoINTGetColor();
+  int n_ = SaberBase::DoINTGetColorFade();
   int c_;
   int start_;
   MixHelper<COLORS...> colors_;

@@ -23,7 +23,7 @@
 // to use here.
 
 
-#define CONFIG_FILE "config/sample_cc.h"
+#define CONFIG_FILE "config/fett263_cc_save_preset_config.h"
 //#define CONFIG_FILE "config/new_mympp_config.h"
 //#define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
@@ -599,7 +599,7 @@ ArgParserInterface* CurrentArgParser;
 #undef CONFIG_PROP
 
 #ifndef PROP_TYPE
-#include "props/saber_sa22c_buttons.h"
+#include "props/fett263-saber.h"
 #endif
 
 PROP_TYPE prop;

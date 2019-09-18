@@ -99,6 +99,7 @@ public:                                                         \
   SABERFUN(SetColor, (int n_),(n_));                     \
   SABERFUN(SetEffect, (int n_),(n_));                     \
   SABERFUN(SetColorScroll, (int n_),(n_));                     \
+  SABERFUN(SetColorFade, (int n_),(n_));                     \
   SABERFUN(ClearPresets,(),());         \
   SABERFUN(MEnter, (), ());						 \
   SABERFUN(MExit, (), ());						 \
@@ -138,6 +139,7 @@ public:                                                         \
 #define SABERBASEINTFUNCTIONS()                     \
   SABERFUNINT(GetColor, (),());                     \
   SABERFUNINT(GetColorScroll, (),());                     \
+  SABERFUNINT(GetColorFade, (),());                     \
   SABERFUNINT(GetEffect, (),());
 
   SABERBASEINTFUNCTIONS();

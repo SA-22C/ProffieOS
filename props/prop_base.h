@@ -210,9 +210,6 @@ public:
 #ifdef ENABLE_AUDIO
     beeper.Beep(0.05, 2000.0);
 #endif
-    #ifdef SAVED_PRESET
-    current_preset_.SaveAt(current_preset_.preset_num);
-    #endif
     SetPreset(current_preset_.preset_num + 1, true);
   }
 
@@ -221,9 +218,6 @@ public:
 #ifdef ENABLE_AUDIO
     beeper.Beep(0.05, 2000.0);
 #endif
-    #ifdef SAVED_PRESET
-    current_preset_.SaveAt(current_preset_.preset_num);
-    #endif
     SetPreset(current_preset_.preset_num - 1, true);
   }
 
@@ -310,10 +304,8 @@ public:
   void ResumePreset() {
 
     FileReader f;
-    CurrentPreset tmp;
     int newPreset;
     int newVolume;
-    LOCK_SD(true);
     if (f.Open("savedpreset.ini") && f.FileSize() > 0) {
       for (; f.Available(); f.skipline()) {
         char variable[33];
@@ -331,13 +323,11 @@ public:
         }
       }
       f.Close();
-      LOCK_SD(false);
       SetPreset(newPreset, false);
       if (newVolume < VOLUME) {
         dynamic_mixer.set_volume(newVolume);
       }
     } else {
-      LOCK_SD(false);
       SetPreset(0, false);
     }
   }
@@ -1023,22 +1013,44 @@ public:
   virtual bool Event2(enum BUTTON button, EVENT event, uint32_t modifiers) = 0;
 
   void SB_SetColor(int n_) override{
+    STDOUT.print("SET COLOR: ");
+    STDOUT.println(n_);
     current_preset_.color_seq = n_;
   }
   void SB_SetEffect(int n_) override{
+    STDOUT.print("SET EFFECT: ");
+    STDOUT.println(n_);
      current_preset_.effect_seq = n_;
   }
   void SB_SetColorScroll(int n_) override{
+    STDOUT.print("SET COLOR SCROLL: ");
+    STDOUT.println(n_);
      current_preset_.color_scroll_seq = n_;
   }
+  void SB_SetColorFade(int n_) override{
+    STDOUT.print("SET COLOR FADE: ");
+    STDOUT.println(n_);
+    current_preset_.color_fade_seq = n_;
+  }
   int SB_INTGetColor() override{
+    STDOUT.print("GET COLOR: ");
+    STDOUT.println(current_preset_.color_seq);
     return current_preset_.color_seq;
   }
   int SB_INTGetEffect() override{
+    STDOUT.print("GET EFFECT: ");
+    STDOUT.println(current_preset_.effect_seq);
     return current_preset_.effect_seq;
   }
   int SB_INTGetColorScroll() override{
-    return current_preset_.effect_seq;
+    STDOUT.print("GET COLOR SCROLL: ");
+    STDOUT.println(current_preset_.color_scroll_seq);
+    return current_preset_.color_scroll_seq;
+  }
+  int SB_INTGetColorFade() override{
+    STDOUT.print("GET COLOR: ");
+    STDOUT.println(current_preset_.color_fade_seq);
+    return current_preset_.color_fade_seq;
   }
   void SB_ClearPresets() override {
     current_preset_.ClearPresets();

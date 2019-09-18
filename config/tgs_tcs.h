@@ -10,6 +10,7 @@ const unsigned int maxLedsPerStrip = 144;
 #define ENABLE_WS2811
 #define ENABLE_SD
 #define USB_CLASS_WEBUSB
+#define SAVED_PRESET
 #define SET1MAIN Red,OrangeRed,Orange,Yellow,GreenYellow,Green,Cyan,DeepSkyBlue,SteelBlue,Blue,Magenta,Pink
 #define SET1A Rgb<25,0,0>,OrangeRed,Rgb<15,15,0>,Rgb<10,15,0>,Rgb<0,25,0>,Rgb<0,15,10>,Rgb<0,0,25>,Rgb<0,0,25>,Rgb<0,0,25>,Rgb<15,0,10>,Rgb<10,0,15>,Rgb<25,0,0>
 #define SET1B Rgb<60,0,0>,Rgb<50,10,0>,Rgb<30,30,0>,Rgb<10,50,0>,Rgb<0,60,0>,Rgb<0,50,10>,Rgb<0,10,50>,Rgb<0,0,60>,Rgb<0,0,60>,Rgb<15,2,60>,Rgb<30,0,30>,Rgb<50,0,10>
@@ -28,16 +29,16 @@ Preset presets[] = {
   { "OUTCAST", "tracks/march.wav",
   StylePtr<InOutHelper<CCAudio<SET1MAIN,SET1FLICKER,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST>,180,500>>(),
   },
-  { "OUTCAST", "tracks/march.wav",
+  { "R1Vader", "tracks/march.wav",
   StylePtr<InOutHelper<CCAudioFlare<SET1MAIN,SET1FLICKER,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST,SET1FLARE>,180,500>>(),
   },
-  { "OUTCAST", "tracks/march.wav",
+  { "Light", "tracks/march.wav",
   StylePtr<InOutHelper<CCAudioFlare<Red,OrangeRed,Orange,Yellow,GreenYellow,Green,Cyan,DeepSkyBlue,SteelBlue,Blue,Magenta,Pink, Rgb<128,0,0>,Rgb<128,34,0>,Rgb<128,82,0>,Rgb<128,128,0>,Rgb<0,87,128>,Rgb<0,128,0>,Rgb<0,128,128>,Rgb<0,95,128>,Rgb<35,65,90>,Rgb<0,0,128>,Rgb<128,0,128>,Rgb<128,96,101>, Blue,Blue,Blue,Red,Red,Red,Red,Red,Red,Red,Cyan,Cyan>,180,500>>(),
   },
-  { "SAVAGEN", "tracks/march.wav",
+  { "Balance", "tracks/march.wav",
   StylePtr<InOutHelper<CCUnstable<SET1MAIN,SET1A,SET1B,SET1C,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST>,180,500>>(),
   },
-  { "SAVAGEN", "tracks/march.wav",
+  { "Yoda", "tracks/march.wav",
   StylePtr<InOutHelper<CCUnstableFlare<SET1MAIN,SET1FLICKER,SET1LOCKUP,SET1DRAG,SET1STAB,SET1CLASH,SET1BLAST,SET1FLARE>,180,500>>(),
   },
   { "RETURN", "tracks/march.wav",
