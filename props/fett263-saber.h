@@ -74,10 +74,28 @@ public:
 	   return true;
 
 	// ColorChange
+  #ifdef NO_COLOR_SWING
 	case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON | BUTTON_AUX):
 	SaberBase::DoChange();
   SaberBase::DoMSelect();
 	return true;
+  #else
+  case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON | BUTTON_AUX):
+  if (colorswing_) {
+    SaberBase::DoMExit();
+    colorswing_ = false;
+  } else if (!colorswing_) {
+    SaberBase::DoMEnter();
+    colorswing_ = true;
+  }
+  return true;
+  case EVENTID(BUTTON_NONE, EVENT_SWING, MODE_ON):
+  if (COLOR_CHANGE || COLOR_SCROLL) {
+    SaberBase::DoChange();
+  }
+  return true;
+  #endif
+
 
      // ColorScroll
      case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON | BUTTON_AUX):
@@ -175,6 +193,7 @@ private:
   bool aux_on_ = true;
   bool pointing_down_ = false;
   bool clear_ = false;
+  bool colorswing_ = false;
 };
 
 #endif
