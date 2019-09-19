@@ -152,7 +152,7 @@ public:
 
     switch (screen_) {
       case SCREEN_STARTUP:
-        DrawText("===SA-22C===", 0,15, Starjedi10pt7bGlyphs);
+        DrawText("==SA-22C===", 0,15, Starjedi10pt7bGlyphs);
         DrawText("++Proffie++",-4,31, Starjedi10pt7bGlyphs);
         break;
 
@@ -216,7 +216,7 @@ public:
     Send(DISPLAYALLON_RESUME);           // 0xA4
     Send(NORMALDISPLAY);                 // 0xA6
 
-    Send(DEACTIVATE_SCROLL);
+    //Send(DEACTIVATE_SCROLL);
 
     Send(DISPLAYON);                     //--turn on oled panel
 

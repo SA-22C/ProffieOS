@@ -75,6 +75,10 @@ public:
     addEffect(EFFECT_IGNITION, 0);
   }
 
+  void SB_Clear() override {
+    addEffect(EFFECT_CLEAR, 1.0f);
+  }
+
   void SB_Off(OffType off_type) override {
     switch (off_type) {
       case OFF_BLAST:

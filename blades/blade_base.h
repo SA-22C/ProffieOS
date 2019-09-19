@@ -21,6 +21,7 @@ enum BladeEffectType {
   EFFECT_CHANGEPRESET = 1 << 12, // used to reset presets
   EFFECT_SCROLL = 1 << 13, // used to begin scroll mode
   EFFECT_SELECT = 1 << 14, // used to stop scroll mode
+  EFFECT_CLEAR = 1 << 15, // used to clear effect_change
 };
 
 struct BladeEffect {

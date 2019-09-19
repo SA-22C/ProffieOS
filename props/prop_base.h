@@ -64,7 +64,9 @@ public:
       SaberBase::DoEndLockup();
       SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
     }
+    SaberBase::DoClear();
     SaberBase::TurnOff(off_type);
+
     if (unmute_on_deactivation_) {
       unmute_on_deactivation_ = false;
 #ifdef ENABLE_AUDIO
