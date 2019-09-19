@@ -9,11 +9,7 @@ public:
 
   void run(BladeBase* blade) {
     colors_.run(blade);
-    if (change_.Detect(blade)) {
-      STDOUT.println("CHANGE");
-	n_ = SaberBase::DoINTGetColor();
-   }
-    if (effect_.Detect(blade)) {
+    if (effect_.Detect(blade) && SaberBase::IsOn()) {
 	n_ = (n_ + 1) % sizeof... (COLORS);
   SaberBase::DoSetColor(n_);
    }
@@ -36,21 +32,16 @@ class ColorScroll {
 public:
   void run(BladeBase* blade) {
     colors_.run(blade);
-    if (change_.Detect(blade)) {
-      STDOUT.println("CHANGE");
-	n_ = SaberBase::DoINTGetColorScroll();
-	start_ = 0;
-   }
-    if (effect_.Detect(blade)) {
+    if (effect_.Detect(blade) && SaberBase::IsOn()) {
 	n_ = (n_ + 1) % sizeof... (COLORS);
   SaberBase::DoSetColorScroll(n_);
 	start_ = 0;
    }
-    if (select_.Detect(blade)) {
+    if (select_.Detect(blade)&& SaberBase::IsOn()) {
 	n_ = n_;
      start_ = 0;
    }
-    if (scroll_.Detect(blade)) {
+    if (scroll_.Detect(blade)&& SaberBase::IsOn()) {
 	start_ = 1;
    }
 	if (start_ == 1) {
@@ -88,16 +79,11 @@ class EffectScroll {
 public:
   void run(BladeBase* blade) {
     colors_.run(blade);
-    if (change_.Detect(blade)) {
-      STDOUT.println("CHANGE");
-	n_ = SaberBase::DoINTGetEffect();
-	start_ = 0;
-   }
-    if (select_.Detect(blade)) {
+    if (select_.Detect(blade) && SaberBase::IsOn()) {
 	n_ = n_;
      start_ = 0;
    }
-    if (scroll_.Detect(blade)) {
+    if (scroll_.Detect(blade) && SaberBase::IsOn()) {
 	start_ = 1;
    }
 	if (start_ == 1) {
@@ -141,13 +127,7 @@ public:
   void run(BladeBase* blade) {
     colors_.run(blade);
     uint32_t m = millis();
-    if (change_.Detect(blade)) {
-      STDOUT.println("CHANGE");
-	n_ = SaberBase::DoINTGetColorFade();
-     c_ = 0;
-     start_ = 0;
-    }
-    if (effect_.Detect(blade)) {
+    if (effect_.Detect(blade) && SaberBase::IsOn()) {
       on_millis_ = m;
 	 c_ = n_;
       n_ = (n_ + 1) % sizeof... (COLORS);

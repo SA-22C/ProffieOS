@@ -39,8 +39,6 @@ public:
         aux_on_ = true;
         On();
 #else
-       // DoPreset is used to reset color change to start when preset is changed
-	  SaberBase::DoPreset();
         next_preset();
 #endif
 	return true;
@@ -77,7 +75,6 @@ public:
   #ifdef NO_COLOR_SWING
 	case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON | BUTTON_AUX):
 	SaberBase::DoChange();
-  SaberBase::DoMSelect();
 	return true;
   #else
   case EVENTID(BUTTON_POWER, EVENT_CLICK_SHORT, MODE_ON | BUTTON_AUX):
@@ -101,13 +98,11 @@ public:
      case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_ON | BUTTON_AUX):
 	//beeper.Beep(0.5, 2000.0);
 	SaberBase::DoScroll();
-  SaberBase::DoMEnter();
 	return true;
 
      // ColorSelect
       case EVENTID(BUTTON_AUX, EVENT_CLICK_SHORT, MODE_ON | BUTTON_POWER):
 	SaberBase::DoSelect();
-  SaberBase::DoMExit();
 	return true;
 
 #if NUM_BUTTONS > 1
@@ -153,7 +148,6 @@ public:
 	return true;
 
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_OFF | BUTTON_POWER):
-        SaberBase::DoPreset();
         next_preset();
 	return true;
 
@@ -162,17 +156,14 @@ public:
         clear_ = false;
         SaberBase::DoMExit();
       } else {
-        SaberBase::DoPreset();
         previous_preset();
       }
 	return true;
 
       case EVENTID(BUTTON_AUX2, EVENT_CLICK_SHORT, MODE_OFF):
 #ifdef DUAL_POWER_BUTTONS
-        SaberBase::DoPreset();
         next_preset();
 #else
-        SaberBase::DoPreset();
         previous_preset();
 #endif
 	return true;

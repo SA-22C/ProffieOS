@@ -53,9 +53,6 @@ public:
     addEffect(EFFECT_CHANGE, 1.0f);
     SaberBase::DoMSelect();
   }
-  void SB_Preset() override {
-    addEffect(EFFECT_CHANGEPRESET, 1.0f);
-  }
   void SB_Scroll() override {
     addEffect(EFFECT_SCROLL, 1.0f);
     SaberBase::DoMEnter();
@@ -70,13 +67,8 @@ public:
   void SB_Force() override {
     addEffect(EFFECT_FORCE, 1.0f);
   }
-
   void SB_On() override {
     addEffect(EFFECT_IGNITION, 0);
-  }
-
-  void SB_Clear() override {
-    addEffect(EFFECT_CLEAR, 1.0f);
   }
 
   void SB_Off(OffType off_type) override {

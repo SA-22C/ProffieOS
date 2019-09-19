@@ -101,10 +101,8 @@ public:                                                         \
   SABERFUN(SetColorScroll, (int n_),(n_));                     \
   SABERFUN(SetColorFade, (int n_),(n_));                     \
   SABERFUN(ClearPresets,(),());         \
-  SABERFUN(Clear, (),());               \
   SABERFUN(MEnter, (), ());						 \
   SABERFUN(MExit, (), ());						 \
-  SABERFUN(Preset, (), ());                      \
   SABERFUN(Scroll, (), ());                      \
   SABERFUN(Select, (), ());                      \
   SABERFUN(MSelect, (), ());					 \

@@ -100,44 +100,30 @@ public:
 
       if (!strcmp(variable, "name")) {
 	name = f->readString();
-  STDOUT.print("reading name from presets.ini: ");
-  STDOUT.println(name.get());
 	continue;
       }
       if (!strcmp(variable, "font")) {
 	font = f->readString();
-  STDOUT.print("reading font from presets.ini: ");
-  STDOUT.println(font.get());
 	continue;
       }
       if (!strcmp(variable, "track")) {
 	track = f->readString();
-  STDOUT.print("reading track from presets.ini: ");
-  STDOUT.println(track.get());
 	continue;
       }
       if (!strcmp(variable, "color_seq")) {
-        STDOUT.print("reading color from presets.ini: ");
         color_seq = f->readIntValue();
-        STDOUT.println(color_seq);
         continue;
       }
       if (!strcmp(variable, "effect_seq")) {
-        STDOUT.print("reading effect scroll from presets.ini: ");
         effect_seq = f->readIntValue();
-        STDOUT.println(effect_seq);
         continue;
       }
       if (!strcmp(variable, "color_scroll_seq")) {
-        STDOUT.print("reading color scroll from presets.ini: ");
         color_scroll_seq = f->readIntValue();
-        STDOUT.println(color_scroll_seq);
         continue;
       }
       if (!strcmp(variable, "color_fade_seq")) {
-        STDOUT.print("reading color fade from presets.ini: ");
         color_fade_seq = f->readIntValue();
-        STDOUT.println(color_fade_seq);
         continue;
       }
       if (!strcmp(variable, "style")) {
@@ -157,33 +143,19 @@ public:
 
   bool Write(FileReader* f) {
     f->Write("new_preset\n");
-    STDOUT.print("Writing font to presets.ini: ");
-    STDOUT.println(font.get());
     f->write_key_value("font", font.get());
-    STDOUT.print("Writing track to presets.ini: ");
-    STDOUT.println(track.get());
     f->write_key_value("track", track.get());
     char value[30];
     itoa(color_seq, value, 10);
-    STDOUT.print("Writing color to presets.ini: ");
-    STDOUT.println(value);
     f->write_key_value("color_seq", value);
     itoa(effect_seq, value, 10);
-    STDOUT.print("Writing effect to presets.ini: ");
-    STDOUT.println(value);
     f->write_key_value("effect_seq", value);
     itoa(color_scroll_seq, value, 10);
-    STDOUT.print("Writing color scroll to presets.ini: ");
-    STDOUT.println(value);
     f->write_key_value("color_scroll_seq", value);
     itoa(color_fade_seq, value, 10);
-    STDOUT.print("Writing color fade to presets.ini: ");
-    STDOUT.println(value);
     f->write_key_value("color_fade_seq", value);
 #define WRITE_PRESET_STYLE(N) f->write_key_value("style", current_style##N.get());
     ONCEPERBLADE(WRITE_PRESET_STYLE);
-    STDOUT.print("Writing name to presets.ini: ");
-    STDOUT.println(name.get());
     f->write_key_value("name", name.get());
     return true;
   }
@@ -346,7 +318,6 @@ public:
     Clear();
     LOCK_SD(true);
     if (!Load(preset)) {
-      STDOUT.println("error loading presets.ini");
       Set(preset);
     }
     LOCK_SD(false);

@@ -91,9 +91,7 @@ public:
           aux_on_ = true;
           On();
 #else
-       // DoPreset is used to reset color change to start when preset is changed
       if (!MODE_VOLUME) {
-		SaberBase::DoPreset();
         next_preset();
 	  }
 
@@ -272,7 +270,6 @@ if (!SaberBase::Lockup()) {
       case EVENTID(BUTTON_POWER, EVENT_CLICK_LONG, MODE_OFF):
 #if NUM_BUTTONS == 1
 	  if (!MODE_VOLUME);
-	    SaberBase::DoPreset();
         next_preset();
 
         return true;
@@ -305,7 +302,6 @@ if (!SaberBase::Lockup()) {
 
       case EVENTID(BUTTON_NONE, EVENT_CLASH, MODE_OFF | BUTTON_POWER):
 	    if (!MODE_VOLUME) {
-          SaberBase::DoPreset();
           next_preset();
 		}
 
@@ -321,7 +317,6 @@ if (!SaberBase::Lockup()) {
       case EVENTID(BUTTON_POWER, EVENT_HELD_LONG, MODE_OFF):
 #endif
         if (!MODE_VOLUME) {
-		  SaberBase::DoPreset();
           previous_preset();
 		}
 
@@ -356,13 +351,11 @@ if (!SaberBase::Lockup()) {
 
 #ifdef DUAL_POWER_BUTTONS
         if (!MODE_VOLUME) {
-        	SaberBase::DoPreset();
 			next_preset();
 
 		}
 #else
         if (!MODE_VOLUME) {
-            SaberBase::DoPreset();
 			previous_preset();
 
 		}

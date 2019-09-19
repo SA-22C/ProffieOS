@@ -64,7 +64,7 @@ public:
       SaberBase::DoEndLockup();
       SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
     }
-    SaberBase::DoClear();
+
     SaberBase::TurnOff(off_type);
 
     if (unmute_on_deactivation_) {
@@ -1015,43 +1015,27 @@ public:
   virtual bool Event2(enum BUTTON button, EVENT event, uint32_t modifiers) = 0;
 
   void SB_SetColor(int n_) override{
-    STDOUT.print("SET COLOR: ");
-    STDOUT.println(n_);
     current_preset_.color_seq = n_;
   }
   void SB_SetEffect(int n_) override{
-    STDOUT.print("SET EFFECT: ");
-    STDOUT.println(n_);
-     current_preset_.effect_seq = n_;
+    current_preset_.effect_seq = n_;
   }
   void SB_SetColorScroll(int n_) override{
-    STDOUT.print("SET COLOR SCROLL: ");
-    STDOUT.println(n_);
-     current_preset_.color_scroll_seq = n_;
+    current_preset_.color_scroll_seq = n_;
   }
   void SB_SetColorFade(int n_) override{
-    STDOUT.print("SET COLOR FADE: ");
-    STDOUT.println(n_);
     current_preset_.color_fade_seq = n_;
   }
   int SB_INTGetColor() override{
-    STDOUT.print("GET COLOR: ");
-    STDOUT.println(current_preset_.color_seq);
     return current_preset_.color_seq;
   }
   int SB_INTGetEffect() override{
-    STDOUT.print("GET EFFECT: ");
-    STDOUT.println(current_preset_.effect_seq);
     return current_preset_.effect_seq;
   }
   int SB_INTGetColorScroll() override{
-    STDOUT.print("GET COLOR SCROLL: ");
-    STDOUT.println(current_preset_.color_scroll_seq);
     return current_preset_.color_scroll_seq;
   }
   int SB_INTGetColorFade() override{
-    STDOUT.print("GET COLOR: ");
-    STDOUT.println(current_preset_.color_fade_seq);
     return current_preset_.color_fade_seq;
   }
   void SB_ClearPresets() override {
