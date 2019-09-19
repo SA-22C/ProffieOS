@@ -1,6 +1,6 @@
 /*
  Teensy Lightsaber Firmware
- http://fredrik.hubbe.net/lightsaber/teensy_saber.html
+ http://fredrik.hubbe.net/lightsaber/teensy_saber.htmls
  Copyright (c) 2016-2017 Fredrik Hubinette
  Additional copyright holders listed inline below.
 
@@ -599,7 +599,7 @@ ArgParserInterface* CurrentArgParser;
 #undef CONFIG_PROP
 
 #ifndef PROP_TYPE
-#include "props/saber_sa22c_buttons.h"
+#include "props/fett263-saber.h"
 #endif
 
 PROP_TYPE prop;

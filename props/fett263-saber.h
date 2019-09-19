@@ -90,7 +90,7 @@ public:
   }
   return true;
   case EVENTID(BUTTON_NONE, EVENT_SWING, MODE_ON):
-  if (COLOR_CHANGE || COLOR_SCROLL) {
+  if (colorswing_) {
     SaberBase::DoChange();
   }
   return true;
