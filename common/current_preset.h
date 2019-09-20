@@ -305,6 +305,7 @@ public:
     LSFS::Remove("presets.ini");
     LSFS::Remove("presets.tmp");
     LSFS::Remove("savedpreset.ini");
+    dynamic_mixer.set_volume(VOLUME);
     LOCK_SD(false);
   }
 
