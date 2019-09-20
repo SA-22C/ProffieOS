@@ -10,7 +10,7 @@ const unsigned int maxLedsPerStrip = 144;
 #define ENABLE_WS2811
 #define ENABLE_SD
 #define NO_COLOR_SWING
-#define SAVED_PRESET
+#define NO_SAVED_PRESET
 #endif
 
 #ifdef CONFIG_PRESETS

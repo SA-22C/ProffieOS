@@ -294,7 +294,6 @@ public:
     out.Write("end\n");
     out.Close();
     UpdateINI();
-    SavePreset(position + 1);
     preset_num = position;
     LOCK_SD(false);
   }
@@ -314,6 +313,7 @@ public:
     #ifdef SAVED_PRESET
     if (font.get() != NULL) {
       Save();
+      SavePreset(preset);
     }
     Clear();
     LOCK_SD(true);
@@ -328,6 +328,7 @@ public:
 
 bool SavePreset(int preset) {
   if (preset >= 0 && preset <= current_config->num_presets) {
+    LOCK_SD(true);
     FileReader c;
     LSFS::Remove("savedpreset.ini");
     c.Create("savedpreset.ini");
@@ -337,6 +338,7 @@ bool SavePreset(int preset) {
     itoa(dynamic_mixer.get_volume(), value, 10);
     c.write_key_value("volume", value);
     c.Close();
+    LOCK_SD(false);
   }
 }
 };
