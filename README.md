@@ -19,7 +19,7 @@ Proffie OS supports:
 
 ### SA-22C Features
 * Color/Effect Change On-The-Fly, by Fernando Darosa  
-* Saber save state - saber remembers last activated preset and volume level and resumes after sleep/power cut.
+* Saber save state - saber remembers last activated preset, volume level, blade color and effect settings and resumes after sleep/power cut.
 * Plecter fonts - spin and stab effects
 * NEC fonts - slsh effects
 * Smooth Swing V2.1 - Accent effects - spin, swng, slsh, stab layered over the high/low swing pairs
@@ -109,12 +109,19 @@ now we go back to the style itself and we will replace DeepSkyBlue with the Colo
 * AudioFlicker<ColorChangeFade<400,DeepSkyBlue,Red,Green,Yellow>,ColorChangeFade<400,SteelBlue,Rgb<128,0,0>,Rgb<0,128,0>,LemonChiffon>>
 
 and now we have our DeepSkyBlue/SteelBlue blade as default and then we advance the colors with each "on-the-fly" change.
-Current Styles
 
-- 1 ColorChange<COLORS...> =  List as many colors (or effects) within the style and advance through list using "on-the-fly" change.  Example =  ColorChange<Red,Orange,Yellow,Green,DeepSkyBlue,Blue,Pink,Magenta>
-- 2 ColorChangeFade<TRANSITION (ms), COLORS...> =  List as many colors (or effects) within the style and advance through list using "on-the-fly" change. Each color will fade into the next over the TRANSITION TIME (ms). Example =  ColorChange<400,Red,Orange,Yellow,Green,DeepSkyBlue,Blue,Pink,Magenta> (fade will take 400ms per color)
-- 3 EffectScroll<DISPLAY (ms), COLORS...> =  List as many colors (or effects) within the style and advance through list using "scroll/select". To change colors/effects activate "Scroll Mode" and continously advance through the list with each item showing for DISPLAY (ms) until you "Select".  Shorter display times will act as a quick menu, longer display times will allow the Scroll Mode to act like a DEMO Mode, which can be entered or exited at will.
-- 4 ColorScroll<DISPLAY (ms), COLORS...> =  List as many colors (or effects) within the style and advance through list using "on-the-fly" change OR "scroll/select".  Each "on-the-fly" change will advance through the list one at a time OR activate "Scroll Mode" and continuously advance through the list with each item showing for DISPLAY (ms) until you "Select".  Shorter display times will act as a quick menu, longer display times will allow the Scroll Mode to act like a DEMO Mode, which can be entered or exited at will.
+### Current Styles
+
+#### ColorChange<COLORS...> 
+List as many colors (or effects) within the style and advance through list using "on-the-fly" change.
+* Example = ColorChange<Red,Orange,Yellow,Green,DeepSkyBlue,Blue,Pink,Magenta>
+#### ColorChangeFade<TRANSITION (ms), COLORS...> 
+List as many colors (or effects) within the style and advance through list using "on-the-fly" change. Each color will fade into the next over the TRANSITION TIME (ms).
+* Example = ColorChange<400,Red,Orange,Yellow,Green,DeepSkyBlue,Blue,Pink,Magenta> (fade will take 400ms per color)
+#### EffectScroll<DISPLAY (ms), COLORS...> 
+List as many colors (or effects) within the style and advance through list using "scroll/select". To change colors/effects activate "Scroll Mode" and continously advance through the list with each item showing for DISPLAY (ms) until you "Select". Shorter display times will act as a quick menu, longer display times will allow the Scroll Mode to act like a DEMO Mode, which can be entered or exited at will.
+#### ColorScroll<DISPLAY (ms), COLORS...> 
+List as many colors (or effects) within the style and advance through list using "on-the-fly" change OR "scroll/select". Each "on-the-fly" change will advance through the list one at a time OR activate "Scroll Mode" and continuously advance through the list with each item showing for DISPLAY (ms) until you "Select". Shorter display times will act as a quick menu, longer display times will allow the Scroll Mode to act like a DEMO Mode, which can be entered or exited at will.
 
 
 ### Color Change Templates
@@ -188,7 +195,11 @@ For the standard two-button saber, we’ve added some config file options to cus
 - This removes the hold power + aux action to enter a color change mode and instead simply changes color on each hold power + click aux action
 
 ### SAVED_PRESET
-- I’ve moved the saved preset option from a default ON to default OFF.  If you want your saber to remember the current font and volume settings when the saber is powered off, you need to add this to your config file.
+- By default, the saber will not remember preset state: Color Change settigns reset when you move to the next preset and the saber always boots to preset 0.  Adding this parameter enables Saved State mode.  In this mode, the saber will save your current settings each time you switch presets.  Then if power is cut, the saber reads in the saved state from the SD card and resumes just where you left off.
+
+If you want to clear your saved state, there is a new menu option to do so.  With the saber blade off, press power and toggle aux.  You will hear the menu entry sound.  If you entered this menu by accident or changed your mind, press aux and toggle power to exit the reset menu, you will hear the menu exit sound and the reset is cancelled.  If you want to proceed with the preset, press power and toggle aux again. You wil hear the select sound and your saber will boot to preset 0.  All settings will be removed and your saved preset, color, volume and effect options will be reset to default.
+
+Note that if you change your configuration and re-flash the saber, you will need to perform this reset operation to ensure that your new preset and font options are available after your flash.
 
 ## Fett263 Optional Button Configuration
 
