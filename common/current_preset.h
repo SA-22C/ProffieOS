@@ -301,6 +301,10 @@ public:
   void Save() { SaveAt(preset_num); }
 
   void ClearPresets() {
+    SaberBase::DoSetColor(0);
+    SaberBase::DoSetEffect(0);
+    SaberBase::DoSetColorFade(0);
+    SaberBase::DoSetColorScroll(0);
     LOCK_SD(true);
     LSFS::Remove("presets.ini");
     LSFS::Remove("presets.tmp");
