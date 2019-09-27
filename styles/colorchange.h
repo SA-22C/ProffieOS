@@ -78,6 +78,10 @@ template<int millis_per_color, class... COLORS>
 class EffectScroll {
 public:
   void run(BladeBase* blade) {
+    if (setup) {
+      n_ = SaberBase::DoINTGetEffect();
+      setup = false;
+    }
     colors_.run(blade);
     if (select_.Detect(blade) && SaberBase::IsOn()) {
 	n_ = n_;
@@ -111,6 +115,7 @@ private:
   int n_ = SaberBase::DoINTGetEffect();
   int start_;
   MixHelper<COLORS...> colors_;
+  bool setup = true;
 };
 
 // Transition Modes - these Color Change / Effect Change modes feature built in transitions, the transition time (ms) can be set to
