@@ -12,6 +12,7 @@ public:
     if (effect_.Detect(blade) && SaberBase::IsOn()) {
 	n_ = (n_ + 1) % sizeof... (COLORS);
   SaberBase::DoSetColor(n_);
+  SaberBase::DoSavePresetChanges();
    }
   }
   OverDriveColor getColor(int led) {
@@ -35,6 +36,7 @@ public:
     if (effect_.Detect(blade) && SaberBase::IsOn()) {
 	n_ = (n_ + 1) % sizeof... (COLORS);
   SaberBase::DoSetColorScroll(n_);
+  SaberBase::DoSavePresetChanges();
 	start_ = 0;
    }
     if (select_.Detect(blade)&& SaberBase::IsOn()) {
@@ -53,6 +55,7 @@ public:
        } else {
 	   n_ = (n_ + 1) % sizeof...(COLORS);
      SaberBase::DoSetColorScroll(n_);
+     SaberBase::DoSavePresetChanges();
 	  last_micros_ += millis_per_color * 1000;
       }
     }
@@ -99,6 +102,7 @@ public:
        } else {
 	   n_ = (n_ + 1) % sizeof...(COLORS);
      SaberBase::DoSetEffect(n_);
+     SaberBase::DoSavePresetChanges();
 	  last_micros_ += millis_per_color * 1000;
       }
     }
@@ -137,6 +141,7 @@ public:
 	 c_ = n_;
       n_ = (n_ + 1) % sizeof... (COLORS);
       SaberBase::DoSetColorFade(n_);
+      SaberBase::DoSavePresetChanges();
       start_ = 1;
     }
     if (start_ == 1) {

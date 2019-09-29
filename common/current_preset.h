@@ -309,18 +309,15 @@ public:
     LSFS::Remove("presets.ini");
     LSFS::Remove("presets.tmp");
     LSFS::Remove("savedpreset.ini");
-    dynamic_mixer.set_volume(VOLUME);
     LOCK_SD(false);
+    dynamic_mixer.set_volume(VOLUME);
   }
 
   void SetPreset(int preset) {
     //Clear();
     #ifdef SAVED_PRESET
-    if (font.get() != NULL) {
-      Save();
-      SavePreset(preset);
-    }
     Clear();
+    SavePreset(preset);
     LOCK_SD(true);
     if (!Load(preset)) {
       Set(preset);
@@ -333,6 +330,7 @@ public:
 
 bool SavePreset(int preset) {
   if (preset >= 0 && preset <= current_config->num_presets) {
+    STDOUT.println("Saving Current Preset");
     LOCK_SD(true);
     FileReader c;
     LSFS::Remove("savedpreset.ini");

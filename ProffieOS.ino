@@ -23,7 +23,7 @@
 // to use here.
 
 
-#define CONFIG_FILE "config/tgs_tcs.h"
+#define CONFIG_FILE "config/esb2.h"
 //#define CONFIG_FILE "config/new_mympp_config.h"
 //#define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"

@@ -42,7 +42,7 @@ public:
   uint32_t last_clash_ = 0;
   uint32_t clash_timeout_ = 100;
   bool clash_pending_ = false;
-
+  bool savepending_ = false;
   virtual void On() {
     if (SaberBase::IsOn()) return;
     if (current_style() && current_style()->NoOnOff())
@@ -52,11 +52,11 @@ public:
     MountSDCard();
     EnableAmplifier();
     SaberBase::TurnOn();
-
     // Avoid clashes a little bit while turning on.
     // It might be a "clicky" power button...
     IgnoreClash(300);
   }
+
 
   virtual void Off(OffType off_type = OFF_NORMAL) {
     if (!SaberBase::IsOn()) return;
@@ -78,6 +78,7 @@ public:
       SetMute(false);
     }
   }
+
 
   void IgnoreClash(size_t ms) {
     if (clash_pending_) return;
@@ -171,6 +172,17 @@ public:
 
   // Select preset (font/style)
   void SetPreset(int preset_num, bool announce) {
+    #ifdef SAVED_PRESET
+    if (savepending_) {
+      LOCK_SD(true);
+      STDOUT.println("Saving Preset Settings");
+      if (current_preset_.font.get() != NULL) {
+        current_preset_.SaveAt(current_preset_.preset_num);
+      }
+      LOCK_SD(false);
+      savepending_ = false;
+    }
+    #endif
     bool on = SaberBase::IsOn();
     if (on) Off();
     // First free all styles, then allocate new ones to avoid memory
@@ -542,7 +554,6 @@ public:
   }
 
   uint32_t last_beep_;
-
   void Loop() override {
     if (clash_pending_ && millis() - last_clash_ >= clash_timeout_) {
       clash_pending_ = false;
@@ -1041,6 +1052,9 @@ public:
   void SB_ClearPresets() override {
     current_preset_.ClearPresets();
     SetPreset(0, true);
+  }
+  void SB_SavePresetChanges() override {
+    savepending_ = true;
   }
 
 protected:
