@@ -1,3 +1,7 @@
+# PLEASE READ!
+This fork is depricated and no longer supported.  Please refer to the main ProffieOS release for current downloads.
+
+
 # ProffieOS - SA-22C Fork
 
 The open source operating system. Proffie OS is supported on various platforms ranging from Teensy 3.2 development boards to its own dedicated ProffieBoard reference hardware.
